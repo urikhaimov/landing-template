@@ -6,19 +6,18 @@ import { useContext } from "react";
 import { AppContext } from "../lib/AppContext";
 
 export default function Hero() {
-  const { ui, toggleLang, toggleMode } = useContext(AppContext);
+const { ui, toggleLang, toggleMode, mode } = useContext(AppContext);
 
   return (
     <Box
       sx={{
         position: "relative",
-        height: "90vh",
+       
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         textAlign: "center",
-        color: "#fff",
-      
+        color: (theme) => theme.palette.text.primary,
         backgroundSize: "cover",
         backgroundPosition: "center",
         px: 2,
@@ -50,8 +49,8 @@ export default function Hero() {
           </Button>
 
           <Button variant="outlined" onClick={toggleMode}>
-            {ui.toggleTheme}
-          </Button>
+  {ui.getToggleThemeLabel(mode)}
+</Button>
         </Box>
       </motion.div>
     </Box>
