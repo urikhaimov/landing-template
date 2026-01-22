@@ -45,7 +45,7 @@ export default function Contact() {
   };
 
   return (
-    <Box sx={{ py: 10, px: 2 }}>
+    <Box  id="contact" sx={{ py: 10, px: 2 }}>
       <Typography
         variant="h4"
         sx={{ textAlign: "center", fontWeight: "bold", mb: 6 }}

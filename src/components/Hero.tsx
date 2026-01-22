@@ -39,19 +39,7 @@ const { ui, toggleLang, toggleMode, mode } = useContext(AppContext);
           {ui.heroSubtitle}
         </Typography>
 
-        <Box sx={{ display: "flex", gap: 2, justifyContent: "center", flexWrap: "wrap" }}>
-          <Button variant="contained" color="primary" size="large">
-            {ui.callToAction}
-          </Button>
-
-          <Button variant="outlined" color="secondary" onClick={toggleLang}>
-            {ui.toggleLang}
-          </Button>
-
-          <Button variant="outlined" onClick={toggleMode}>
-  {ui.getToggleThemeLabel(mode)}
-</Button>
-        </Box>
+       
       </motion.div>
     </Box>
   );

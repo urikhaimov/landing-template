@@ -13,7 +13,9 @@ export default function Services() {
   const { ui } = context;
 
   return (
-    <Box sx={{ py: 10, px: 2, textAlign: "center" }}>
+    <Box 
+      id="services"
+      sx={{ py: 10, px: 2, textAlign: "center" }}>
       {/* Section Title */}
       <Typography variant="h4" sx={{ fontWeight: "bold", mb: 6 }}>
         {ui.servicesTitle}

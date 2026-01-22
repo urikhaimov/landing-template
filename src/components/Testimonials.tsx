@@ -27,7 +27,7 @@ export default function Testimonials() {
   };
 
   return (
-    <Box sx={{ py: 10, px: 2 }}>
+    <Box id="testimonials" sx={{ py: 10, px: 2 }}>
       {/* Section Title */}
       <Typography
         variant="h4"
@@ -36,12 +36,12 @@ export default function Testimonials() {
         {ui.reviewsTitle}
       </Typography>
 
-      <Box 
-        sx={{ 
-          maxWidth: 600, 
+      <Box
+        sx={{
+          maxWidth: 600,
           mx: "auto",
           width: "100%",
-          overflow: "hidden",
+          overflow: "hidden", 
         }}
       >
         <motion.div
@@ -52,25 +52,34 @@ export default function Testimonials() {
         >
           <Slider {...settings}>
             {ui.reviews.map((review: ReviewItem, index: number) => (
-              <Box key={`${review.name}-${index}`} sx={{ px: 2 }}>
+              <Box
+                key={`${review.name}-${index}`}
+                sx={{
+                  px: 2,
+                  py: 1,
+                  height: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
                 <Paper
                   elevation={4}
                   sx={{
                     p: 4,
                     borderRadius: 3,
                     textAlign: "center",
-                    minHeight: 180,
+                    minHeight: 260, // ❤️ FIX: more height
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    overflow: "hidden", // ❤️ FIX: no scrollbars
                   }}
                 >
                   <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1 }}>
                     {review.name}
                   </Typography>
 
-                  {/* 
-                    FIXED:
-                    Instead of "{review.comment}"
-                    we use &ldquo; &rdquo; 
-                  */}
                   <Typography variant="body1" sx={{ opacity: 0.8 }}>
                     &ldquo;{review.comment}&rdquo;
                   </Typography>

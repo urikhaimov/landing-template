@@ -20,7 +20,9 @@ export default function FAQ() {
   const { ui, lang } = context;
 
   return (
-    <Box sx={{ py: 10, px: 2 }}>
+    <Box 
+      id="faq"
+     sx={{ py: 10, px: 2 }}>
       <Typography
         variant="h4"
         sx={{ textAlign: "center", fontWeight: "bold", mb: 6 }}
