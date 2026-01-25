@@ -101,7 +101,7 @@ export const ui: Record<Locale, LanguagePack> = {
       { name: "Ron", comment: "Fast and professional." },
     ],
 
-    faqTitle: "Frequently Asked Questions",
+    faqTitle: "FAQ",
     faq: [
       { q: "How long does a website take?", a: "Usually 1–3 weeks." },
       { q: "Do you provide support?", a: "Yes, full ongoing support." },

@@ -2,8 +2,7 @@
 
 import { Box, Typography, TextField, Button, Alert } from "@mui/material";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
-import { useContext } from "react";
+import { useState, useContext } from "react";
 import { AppContext } from "../lib/AppContext";
 
 interface FormValues {
@@ -18,6 +17,8 @@ export default function Contact() {
 
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<"success" | "error" | null>(null);
+
+  const rtl = lang === "he";
 
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
@@ -45,10 +46,14 @@ export default function Contact() {
   };
 
   return (
-    <Box  id="contact" sx={{ py: 10, px: 2 }}>
+    <Box id="contact" sx={{ py: 10, px: 2 }}>
       <Typography
         variant="h4"
-        sx={{ textAlign: "center", fontWeight: "bold", mb: 6 }}
+        sx={{
+          textAlign: "center",
+          fontWeight: "bold",
+          mb: 6,
+        }}
       >
         {ui.contactTitle}
       </Typography>
@@ -62,48 +67,80 @@ export default function Contact() {
           display: "flex",
           flexDirection: "column",
           gap: 3,
-          direction: lang === "he" ? "rtl" : "ltr",
+          direction: rtl ? "rtl" : "ltr",
         }}
       >
+        {/* NAME FIELD */}
         <TextField
-          label={lang === "he" ? "שם" : "Name"}
+          label={rtl ? "שם" : "Name"}
           {...register("name", { required: true })}
           required
+          InputLabelProps={{
+            sx: {
+              right: rtl ? 18 : "auto",
+              left: rtl ? "auto" : 14,
+              transformOrigin: rtl ? "top right" : "top left",
+            },
+          }}
+          inputProps={{
+            style: { textAlign: rtl ? "right" : "left" },
+          }}
         />
 
+        {/* EMAIL FIELD */}
         <TextField
           type="email"
-          label={lang === "he" ? "אימייל" : "Email"}
+          label={rtl ? "אימייל" : "Email"}
           {...register("email", { required: true })}
           required
+          InputLabelProps={{
+            sx: {
+              right: rtl ? 18 : "auto",
+              left: rtl ? "auto" : 18,
+              transformOrigin: rtl ? "top right" : "top left",
+            },
+          }}
+          inputProps={{
+            style: { textAlign: rtl ? "right" : "left" },
+          }}
         />
 
+        {/* MESSAGE FIELD */}
         <TextField
-          label={ui.contactPlaceholder}
-          {...register("message", { required: true })}
           multiline
           rows={4}
+          label={rtl ? "הודעה..." : "Message..."}
+          {...register("message", { required: true })}
           required
+          InputLabelProps={{
+            sx: {
+              right: rtl ? 18 : "auto",
+              left: rtl ? "auto" : 18,
+              transformOrigin: rtl ? "top right" : "top left",
+            },
+          }}
+          inputProps={{
+            style: { textAlign: rtl ? "right" : "left" },
+          }}
         />
 
+        {/* SUCCESS ALERT */}
         {status === "success" && (
           <Alert severity="success">
-            {lang === "he" ? "ההודעה נשלחה!" : "Message sent!"}
+            {rtl ? "ההודעה נשלחה!" : "Message sent!"}
           </Alert>
         )}
 
+        {/* ERROR ALERT */}
         {status === "error" && (
           <Alert severity="error">
-            {lang === "he" ? "שגיאה בשליחה" : "Error sending message"}
+            {rtl ? "שגיאה בשליחה" : "Error sending message"}
           </Alert>
         )}
 
-        <Button type="submit" variant="contained" color="primary" disabled={loading}>
-          {loading
-            ? lang === "he"
-              ? "שולח..."
-              : "Sending..."
-            : ui.contactSend}
+        {/* SUBMIT BUTTON */}
+        <Button type="submit" variant="contained" disabled={loading}>
+          {loading ? (rtl ? "שולח..." : "Sending...") : ui.contactSend}
         </Button>
       </Box>
     </Box>
