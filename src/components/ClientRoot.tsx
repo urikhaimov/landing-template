@@ -1,12 +1,20 @@
 "use client";
 
+import { AppProvider } from "@/lib/AppContext";
 import ThemeWrapper from "./ThemeWrapper";
-import { AppProvider } from "../lib/AppContext";
+import NavbarClientWrapper from "./NavbarClientWrapper";
 
-export default function ClientRoot({ children }: { children: React.ReactNode }) {
+export default function ClientRoot({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <AppProvider>
-      <ThemeWrapper>{children}</ThemeWrapper>
+      <ThemeWrapper>
+       
+        {children}
+      </ThemeWrapper>
     </AppProvider>
   );
 }

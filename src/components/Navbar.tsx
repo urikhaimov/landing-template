@@ -1,80 +1,89 @@
 "use client";
+
+import React, { useState, useEffect, useContext } from "react";
 import Image from "next/image";
 import {
   AppBar,
+  Toolbar,
   Box,
   Button,
-  IconButton,
-  Toolbar,
-  useScrollTrigger,
   Drawer,
-  List,
-  ListItem,
+  IconButton,
   ListItemButton,
-  ListItemText,
+  ListItemText
 } from "@mui/material";
+
 import MenuIcon from "@mui/icons-material/Menu";
+import CloseIcon from "@mui/icons-material/Close";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import PhoneIcon from "@mui/icons-material/Phone";
-import CloseIcon from "@mui/icons-material/Close";
 
-import { useContext, useState } from "react";
-import { AppContext } from "../lib/AppContext";
+import { AppContext } from "@/lib/AppContext";
 
-export default function Navbar() {
-  const { ui, toggleLang, toggleMode, mode, lang } = useContext(AppContext);
+export default function NavbarCSR() {
+  const { ui, toggleLang, toggleMode, lang, mode } = useContext(AppContext);
+
   const [open, setOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [lastY, setLastY] = useState(0);
 
-  // Add shadow when scrolled
-  const trigger = useScrollTrigger({
-    disableHysteresis: true,
-    threshold: 10,
-  });
+  useEffect(() => {
+    const handle = () => {
+      const y = window.scrollY;
+      setHidden(y > lastY && y > 80);
+      setLastY(y);
+    };
+    window.addEventListener("scroll", handle);
+    return () => window.removeEventListener("scroll", handle);
+  }, [lastY]);
+
+  const scroll = (id: string) => {
+    const el = document.querySelector(id);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+    setOpen(false);
+  };
 
   return (
     <>
-     <AppBar
-  position="fixed"
-  elevation={trigger ? 4 : 0}
-  sx={{
-    backgroundColor: trigger
-      ? (mode === "dark" ? "rgba(0,0,0,0.75)" : "rgba(255,255,255,0.8)")
-      : "transparent",
-    backdropFilter: trigger ? "blur(16px)" : "none",
-    boxShadow: trigger ? "0 2px 10px rgba(0,0,0,0.1)" : "none",
-    transition: "0.3s ease",
-  }}
->
+      <AppBar
+        position="fixed"
+        elevation={0}
+        sx={{
+          top: hidden ? "-80px" : 0,
+          transition: "top .35s ease",
+          bgcolor:
+            mode === "dark"
+              ? "rgba(20,20,20,0.55)"
+              : "rgba(255,255,255,0.65)",
+          backdropFilter: "blur(14px)",
+          borderBottom:
+            mode === "dark"
+              ? "1px solid rgba(255,255,255,0.1)"
+              : "1px solid rgba(0,0,0,0.06)",
+        }}
+      >
         <Toolbar
           sx={{
-            display: "flex",
+            height: 70,
             justifyContent: "space-between",
             flexDirection: lang === "he" ? "row-reverse" : "row",
           }}
         >
-          {/* LOGO */}
-          <Box sx={{ fontWeight: "bold", fontSize: "1.3rem" }}>
-            <Image
-                src={mode === "dark" ? "/logo-dark.png" : "/logo.png"}
-                alt="Landing Logo"
-                width={40}
-                height={40}
-                style={{ objectFit: "contain" }}
-                />
-          </Box>
+          {/* <Image
+            src={mode === "dark" ? "/logo-dark.png" : "/logo.png"}
+            alt="logo"
+            width={42}
+            height={42}
+            style={{ cursor: "pointer" }}
+            onClick={() => scroll("#hero")}
+          /> */}
 
-          {/* Desktop Menu */}
-          <Box
-            sx={{
-              display: { xs: "none", md: "flex" },
-              alignItems: "center",
-              gap: 2,
-            }}
-          >
-            <Button href="#services">{ui.servicesTitle}</Button>
-            <Button href="#testimonials">{ui.reviewsTitle}</Button>
-            <Button href="#faq">{ui.faqTitle}</Button>
-            <Button href="#contact">{ui.callToAction}</Button>
+          {/* Desktop */}
+          <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
+            <Button onClick={() => scroll("#services")}>{ui.servicesTitle}</Button>
+            <Button onClick={() => scroll("#testimonials")}>{ui.reviewsTitle}</Button>
+            <Button onClick={() => scroll("#faq")}>{ui.faqTitle}</Button>
+            <Button onClick={() => scroll("#contact")}>{ui.callToAction}</Button>
 
             <Button variant="outlined" size="small" onClick={toggleLang}>
               {ui.toggleLang}
@@ -84,76 +93,55 @@ export default function Navbar() {
               {ui.getToggleThemeLabel(mode)}
             </Button>
 
-            {/* WhatsApp */}
-            <IconButton
-              size="small"
-              href="https://wa.me/972547401813"
-              target="_blank"
-              sx={{ color: "#25D366" }}
-            >
+            <IconButton sx={{ color: "#25D366" }} href="https://wa.me/972547401813" target="_blank">
               <WhatsAppIcon />
             </IconButton>
 
-            {/* Phone */}
-            <IconButton size="small" href="tel:+972547401813">
+            <IconButton href="tel:+972547401813">
               <PhoneIcon />
             </IconButton>
           </Box>
 
-          {/* Mobile Menu Button */}
-          <IconButton
-            sx={{ display: { xs: "flex", md: "none" } }}
-            onClick={() => setOpen(true)}
-          >
+          {/* Mobile */}
+          <IconButton sx={{ display: { xs: "flex", md: "none" } }} onClick={() => setOpen(true)}>
             <MenuIcon />
           </IconButton>
         </Toolbar>
       </AppBar>
 
-      {/* Mobile Drawer */}
-      <Drawer anchor={lang === "he" ? "right" : "left"} open={open} onClose={() => setOpen(false)}>
-        <Box sx={{ width: 260, p: 2 }}>
+      <Drawer
+        open={open}
+        onClose={() => setOpen(false)}
+        anchor={lang === "he" ? "right" : "left"}
+      >
+        <Box sx={{ width: 240, p: 2 }}>
           <IconButton onClick={() => setOpen(false)}>
             <CloseIcon />
           </IconButton>
 
-          <List sx={{ mt: 2 }}>
-            <ListItem disablePadding>
-              <ListItemButton href="#services">
-                <ListItemText primary={ui.servicesTitle} />
-              </ListItemButton>
-            </ListItem>
+          <ListItemButton onClick={() => scroll("#services")}>
+            <ListItemText primary={ui.servicesTitle} />
+          </ListItemButton>
 
-            <ListItem disablePadding>
-              <ListItemButton href="#testimonials">
-                <ListItemText primary={ui.reviewsTitle} />
-              </ListItemButton>
-            </ListItem>
+          <ListItemButton onClick={() => scroll("#testimonials")}>
+            <ListItemText primary={ui.reviewsTitle} />
+          </ListItemButton>
 
-            <ListItem disablePadding>
-              <ListItemButton href="#faq">
-                <ListItemText primary={ui.faqTitle} />
-              </ListItemButton>
-            </ListItem>
+          <ListItemButton onClick={() => scroll("#faq")}>
+            <ListItemText primary={ui.faqTitle} />
+          </ListItemButton>
 
-            <ListItem disablePadding>
-              <ListItemButton href="#contact">
-                <ListItemText primary={ui.callToAction} />
-              </ListItemButton>
-            </ListItem>
+          <ListItemButton onClick={() => scroll("#contact")}>
+            <ListItemText primary={ui.callToAction} />
+          </ListItemButton>
 
-            <ListItem disablePadding>
-              <ListItemButton onClick={toggleLang}>
-                <ListItemText primary={ui.toggleLang} />
-              </ListItemButton>
-            </ListItem>
+          <ListItemButton onClick={toggleLang}>
+            <ListItemText primary={ui.toggleLang} />
+          </ListItemButton>
 
-            <ListItem disablePadding>
-              <ListItemButton onClick={toggleMode}>
-                <ListItemText primary={ui.getToggleThemeLabel(mode)} />
-              </ListItemButton>
-            </ListItem>
-          </List>
+          <ListItemButton onClick={toggleMode}>
+            <ListItemText primary={ui.getToggleThemeLabel(mode)} />
+          </ListItemButton>
         </Box>
       </Drawer>
     </>

@@ -1,9 +1,9 @@
 "use client";
+
 import { createContext, useState } from "react";
 import { ui } from "./i18n";
-import { Locale, LanguagePack} from "./i18n";
+import { Locale, LanguagePack } from "./i18n";
 
-// 1️⃣ Define the type for your context value
 export interface AppContextType {
   lang: Locale;
   mode: "light" | "dark";
@@ -12,10 +12,8 @@ export interface AppContextType {
   toggleMode: () => void;
 }
 
-// 2️⃣ Create typed context (not unknown anymore)
 export const AppContext = createContext<AppContextType | null>(null);
 
-// 3️⃣ Provider component
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLang] = useState<Locale>("he");
   const [mode, setMode] = useState<"light" | "dark">("light");
@@ -28,7 +26,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       value={{
         lang,
         mode,
-        ui: ui[lang], // Auto-language
+        ui: ui[lang],
         toggleLang,
         toggleMode,
       }}
