@@ -1,16 +1,17 @@
 "use client";
 
-import React, { useState, useEffect, useContext } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import {
   AppBar,
   Toolbar,
   Box,
   Button,
-  Drawer,
   IconButton,
+  Drawer,
   ListItemButton,
-  ListItemText
+  ListItemText,
+  Paper,
 } from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
@@ -18,82 +19,134 @@ import CloseIcon from "@mui/icons-material/Close";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import PhoneIcon from "@mui/icons-material/Phone";
 
-import { AppContext } from "@/lib/AppContext";
+import { AppContext } from "../lib/AppContext";
 
-export default function NavbarCSR() {
-  const { ui, toggleLang, toggleMode, lang, mode } = useContext(AppContext);
+export default function Navbar() {
+  const { ui, toggleLang, toggleMode, mode, lang } = useContext(AppContext);
+
+  const isClient = typeof window !== "undefined";
 
   const [open, setOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
-  const [lastY, setLastY] = useState(0);
+  const [solid, setSolid] = useState(false); // navbar background change
 
+  const lastY = useRef(0);
+  const lastSpeed = useRef(0);
+
+  // Smart scroll hide logic
   useEffect(() => {
-    const handle = () => {
-      const y = window.scrollY;
-      setHidden(y > lastY && y > 80);
-      setLastY(y);
-    };
-    window.addEventListener("scroll", handle);
-    return () => window.removeEventListener("scroll", handle);
-  }, [lastY]);
+    if (!isClient) return;
 
-  const scroll = (id: string) => {
+    const handleScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastY.current;
+
+      // Scrolling speed (px/ms)
+      const speed = Math.abs(delta);
+      lastSpeed.current = speed;
+
+      // Auto-hide: only when scrolling down fast
+      if (delta > 4 && speed > 1.2) {
+        if (!hidden) setHidden(true);
+      } else if (delta < -4) {
+        if (hidden) setHidden(false);
+      }
+
+      // Change navbar background when scrolling
+      if (y > 20) {
+        if (!solid) setSolid(true);
+      } else {
+        if (solid) setSolid(false);
+      }
+
+      lastY.current = y;
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isClient, hidden, solid]);
+
+  const scrollTo = (id: string) => {
     const el = document.querySelector(id);
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+    if (!el) return;
+
     setOpen(false);
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
+  const links = [
+    { id: "#services", label: ui.servicesTitle },
+    { id: "#testimonials", label: ui.reviewsTitle },
+    { id: "#faq", label: ui.faqTitle },
+    { id: "#contact", label: ui.callToAction },
+  ];
+
+  if (!isClient) return null;
 
   return (
     <>
+      {/* ----- TOP NAVBAR ----- */}
       <AppBar
         position="fixed"
-        elevation={0}
+        elevation={solid ? 3 : 0}
         sx={{
-          top: hidden ? "-80px" : 0,
-          transition: "top .35s ease",
-          bgcolor:
-            mode === "dark"
-              ? "rgba(20,20,20,0.55)"
-              : "rgba(255,255,255,0.65)",
-          backdropFilter: "blur(14px)",
-          borderBottom:
-            mode === "dark"
-              ? "1px solid rgba(255,255,255,0.1)"
-              : "1px solid rgba(0,0,0,0.06)",
+          top: hidden ? "-88px" : "0px",
+          height: 88,
+          transition: "top 0.35s ease, background 0.35s ease, box-shadow 0.35s",
+
+          background:
+            solid
+              ? mode === "dark"
+                ? "rgba(12,12,12,0.9)"
+                : "rgba(255,255,255,0.9)"
+              : "transparent",
+
+          backdropFilter: solid ? "blur(16px)" : "none",
+          borderBottom: solid
+            ? mode === "dark"
+              ? "1px solid rgba(255,255,255,0.08)"
+              : "1px solid rgba(0,0,0,0.06)"
+            : "none",
+
+          zIndex: 3000,
         }}
       >
         <Toolbar
           sx={{
-            height: 70,
+            height: 88,
+            display: "flex",
             justifyContent: "space-between",
             flexDirection: lang === "he" ? "row-reverse" : "row",
+            px: 2,
           }}
         >
-          {/* <Image
+          {/* Logo */}
+          <Image
             src={mode === "dark" ? "/logo-dark.png" : "/logo.png"}
-            alt="logo"
-            width={42}
-            height={42}
+            alt="Logo"
+            width={44}
+            height={44}
             style={{ cursor: "pointer" }}
-            onClick={() => scroll("#hero")}
-          /> */}
+            onClick={() => scrollTo("#hero")}
+          />
 
-          {/* Desktop */}
+          {/* Desktop menu */}
           <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
-            <Button onClick={() => scroll("#services")}>{ui.servicesTitle}</Button>
-            <Button onClick={() => scroll("#testimonials")}>{ui.reviewsTitle}</Button>
-            <Button onClick={() => scroll("#faq")}>{ui.faqTitle}</Button>
-            <Button onClick={() => scroll("#contact")}>{ui.callToAction}</Button>
+            {links.map((link) => (
+              <Button key={link.id} onClick={() => scrollTo(link.id)}>
+                {link.label}
+              </Button>
+            ))}
 
-            <Button variant="outlined" size="small" onClick={toggleLang}>
+            <Button variant="outlined" onClick={toggleLang}>
               {ui.toggleLang}
             </Button>
 
-            <Button variant="outlined" size="small" onClick={toggleMode}>
+            <Button variant="outlined" onClick={toggleMode}>
               {ui.getToggleThemeLabel(mode)}
             </Button>
 
-            <IconButton sx={{ color: "#25D366" }} href="https://wa.me/972547401813" target="_blank">
+            <IconButton href="https://wa.me/972547401813">
               <WhatsAppIcon />
             </IconButton>
 
@@ -102,48 +155,78 @@ export default function NavbarCSR() {
             </IconButton>
           </Box>
 
-          {/* Mobile */}
-          <IconButton sx={{ display: { xs: "flex", md: "none" } }} onClick={() => setOpen(true)}>
+          {/* Mobile hamburger */}
+          <IconButton
+            sx={{ display: { xs: "flex", md: "none" } }}
+            onClick={() => setOpen(true)}
+          >
             <MenuIcon />
           </IconButton>
         </Toolbar>
       </AppBar>
 
+      {/* ----- MOBILE DRAWER ----- */}
       <Drawer
+        anchor={lang === "he" ? "right" : "left"}
         open={open}
         onClose={() => setOpen(false)}
-        anchor={lang === "he" ? "right" : "left"}
+        PaperProps={{
+          sx: {
+            width: 260,
+            p: 2,
+            background: mode === "dark" ? "#111" : "#fafafa",
+          },
+        }}
       >
-        <Box sx={{ width: 240, p: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
           <IconButton onClick={() => setOpen(false)}>
             <CloseIcon />
           </IconButton>
-
-          <ListItemButton onClick={() => scroll("#services")}>
-            <ListItemText primary={ui.servicesTitle} />
-          </ListItemButton>
-
-          <ListItemButton onClick={() => scroll("#testimonials")}>
-            <ListItemText primary={ui.reviewsTitle} />
-          </ListItemButton>
-
-          <ListItemButton onClick={() => scroll("#faq")}>
-            <ListItemText primary={ui.faqTitle} />
-          </ListItemButton>
-
-          <ListItemButton onClick={() => scroll("#contact")}>
-            <ListItemText primary={ui.callToAction} />
-          </ListItemButton>
-
-          <ListItemButton onClick={toggleLang}>
-            <ListItemText primary={ui.toggleLang} />
-          </ListItemButton>
-
-          <ListItemButton onClick={toggleMode}>
-            <ListItemText primary={ui.getToggleThemeLabel(mode)} />
-          </ListItemButton>
         </Box>
+
+        {links.map((link) => (
+          <ListItemButton key={link.id} onClick={() => scrollTo(link.id)}>
+            <ListItemText primary={link.label} />
+          </ListItemButton>
+        ))}
+
+        <ListItemButton onClick={toggleLang}>
+          <ListItemText primary={ui.toggleLang} />
+        </ListItemButton>
+
+        <ListItemButton onClick={toggleMode}>
+          <ListItemText primary={ui.getToggleThemeLabel(mode)} />
+        </ListItemButton>
       </Drawer>
+
+      {/* ----- FLOATING MOBILE BOTTOM BAR (iPhone style) ----- */}
+      <Paper
+        elevation={6}
+        sx={{
+          display: { xs: "flex", md: "none" },
+          position: "fixed",
+          bottom: 16,
+          left: "50%",
+          transform: "translateX(-50%)",
+          borderRadius: "24px",
+          padding: "10px 18px",
+          gap: 3,
+          zIndex: 2800,
+          background: mode === "dark" ? "#222" : "#fff",
+        }}
+      >
+        <IconButton href="https://wa.me/972547401813">
+          <WhatsAppIcon sx={{ fontSize: 28 }} />
+        </IconButton>
+
+        <IconButton onClick={() => scrollTo("#contact")}>
+          <PhoneIcon sx={{ fontSize: 28 }} />
+        </IconButton>
+
+        <IconButton onClick={toggleMode}>
+          {ui.getToggleThemeLabel(mode)}
+        </IconButton>
+      </Paper>
     </>
   );
 }
