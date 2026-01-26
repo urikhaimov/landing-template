@@ -23,29 +23,56 @@ import { AppContext } from "../lib/AppContext";
 
 export default function Navbar() {
   const { ui, toggleLang, toggleMode, mode, lang } = useContext(AppContext);
-
   const isRTL = lang === "he";
 
   const [open, setOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [lastY, setLastY] = useState(0);
+  const [active, setActive] = useState<string>("hero");
 
-  // Hide on scroll
+  /* ────────────────────────────────
+     ACTIVE SECTION (Scroll Spy)
+  ───────────────────────────────── */
+  useEffect(() => {
+    const handleSpy = () => {
+      const sections = ["hero", "services", "testimonials", "faq", "contact"];
+      let current = "hero";
+
+      for (const id of sections) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= 160 && rect.bottom >= 160) {
+          current = id;
+        }
+      }
+
+      setActive(current);
+    };
+
+    window.addEventListener("scroll", handleSpy);
+    return () => window.removeEventListener("scroll", handleSpy);
+  }, []);
+
+  /* ────────────────────────────────
+     Hide navbar on scroll down
+  ───────────────────────────────── */
   useEffect(() => {
     const handleScroll = () => {
       const y = window.scrollY;
-
-      if (y > lastY && y > 100) setHidden(true);
+      if (y > lastY && y > 120) setHidden(true);
       else setHidden(false);
-
       setLastY(y);
     };
 
     window.addEventListener("scroll", handleScroll);
-
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastY]);
 
+  /* ────────────────────────────────
+     Smooth scrolling
+  ───────────────────────────────── */
   const scrollTo = (id: string) => {
     const el = document.querySelector(id);
     if (!el) return;
@@ -54,10 +81,10 @@ export default function Navbar() {
   };
 
   const links = [
-    { id: "#services", label: ui.servicesTitle },
-    { id: "#testimonials", label: ui.reviewsTitle },
-    { id: "#faq", label: ui.faqTitle },
-    { id: "#contact", label: ui.callToAction },
+    { id: "#services", key: "services", label: ui.servicesTitle },
+    { id: "#testimonials", key: "testimonials", label: ui.reviewsTitle },
+    { id: "#faq", key: "faq", label: ui.faqTitle },
+    { id: "#contact", key: "contact", label: ui.callToAction },
   ];
 
   return (
@@ -66,86 +93,110 @@ export default function Navbar() {
         position="fixed"
         elevation={0}
         sx={{
-          top: hidden ? "-90px" : "0",
+          top: hidden ? "-95px" : "0",
           transition: "top 0.35s ease, background 0.25s ease",
           background:
             mode === "dark"
-              ? "rgba(15,15,15,0.65)"
-              : "rgba(255,255,255,0.65)",
-          backdropFilter: "blur(16px)",
+              ? "rgba(20,20,20,0.70)"
+              : "rgba(255,255,255,0.70)",
+          backdropFilter: "blur(14px)",
           borderBottom:
             mode === "dark"
-              ? "1px solid rgba(255,255,255,0.06)"
-              : "1px solid rgba(0,0,0,0.06)",
-          height: 76,
-          display: "flex",
-          justifyContent: "center",
+              ? "1px solid rgba(80,80,80,0.25)"
+              : "1px solid rgba(0,0,0,0.07)",
+          height: 78,
+          zIndex: 2000,
         }}
       >
         <Toolbar
           sx={{
-            width: "100%",
             maxWidth: "1400px",
+            mx: "auto",
+            width: "100%",
             px: 2,
             display: "flex",
             justifyContent: "space-between",
-            flexDirection: isRTL ? "row-reverse" : "row",
             alignItems: "center",
+            flexDirection: isRTL ? "row-reverse" : "row",
           }}
         >
-          {/* LOGO */}
+          {/* ───────── Logo ───────── */}
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Image
               src={mode === "dark" ? "/logo-dark.png" : "/logo.png"}
               alt="Logo"
-              width={40}
-              height={40}
+              width={42}
+              height={42}
               style={{ cursor: "pointer" }}
               onClick={() => scrollTo("#hero")}
             />
           </Box>
 
-          {/* DESKTOP MENU */}
+          {/* ───────── Desktop Menu ───────── */}
           <Box
             sx={{
               display: { xs: "none", md: "flex" },
-              gap: 3,
               alignItems: "center",
+              gap: 3,
+              mx: "auto",
               direction: isRTL ? "rtl" : "ltr",
             }}
           >
-            {links.map((item) => (
-              <Button
-                key={item.id}
-                onClick={() => scrollTo(item.id)}
-                sx={{
-                  fontSize: "0.9rem",
-                  fontWeight: 500,
-                  px: 1,
-                  color: mode === "dark" ? "#fff" : "#111",
-                  opacity: 0.9,
-                  "&:hover": { opacity: 1, textDecoration: "underline" },
-                }}
-              >
-                {item.label}
-              </Button>
-            ))}
+            {links.map((item) => {
+              const isActive = item.key === active;
+              return (
+                <Box
+                  key={item.id}
+                  onClick={() => scrollTo(item.id)}
+                  sx={{
+                    cursor: "pointer",
+                    position: "relative",
+                    fontWeight: isActive ? 700 : 500,
+                    fontSize: isActive ? "1rem" : "0.95rem",
+                    color: mode === "dark" ? "#fff" : "#000",
+                    opacity: isActive ? 1 : 0.8,
+                    transition: "0.25s",
+                    paddingBottom: "4px",
+                    "&:hover": {
+                      opacity: 1,
+                      transform: "translateY(-2px)",
+                    },
+                    "&::after": {
+                      content: '""',
+                      position: "absolute",
+                      bottom: 0,
+                      [isRTL ? "right" : "left"]: 0,
+                      width: isActive ? "100%" : "0%",
+                      height: "3px",
+                      background:
+                        mode === "dark" ? "cyan" : "dodgerblue",
+                      borderRadius: "2px",
+                      transition: "width 0.3s ease",
+                    },
+                    "&:hover::after": {
+                      width: "100%",
+                    },
+                  }}
+                >
+                  {item.label}
+                </Box>
+              );
+            })}
+          </Box>
 
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={toggleLang}
-              sx={{ minWidth: 90 }}
-            >
+          {/* ───────── Desktop Actions ───────── */}
+          <Box
+            sx={{
+              display: { xs: "none", md: "flex" },
+              alignItems: "center",
+              gap: 1.5,
+            }}
+          >
+            <Button variant="outlined" onClick={toggleLang} size="small">
               {ui.toggleLang}
             </Button>
 
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={toggleMode}
-              sx={{ minWidth: 110 }}
-            >
+            <Button variant="outlined" onClick={toggleMode} size="small">
               {ui.getToggleThemeLabel(mode)}
             </Button>
 
@@ -162,7 +213,7 @@ export default function Navbar() {
             </IconButton>
           </Box>
 
-          {/* MOBILE MENU BUTTON */}
+          {/* ───────── Mobile Menu Button ───────── */}
           <IconButton
             sx={{ display: { xs: "flex", md: "none" } }}
             onClick={() => setOpen(true)}
@@ -172,7 +223,7 @@ export default function Navbar() {
         </Toolbar>
       </AppBar>
 
-      {/* MOBILE DRAWER */}
+      {/* ───────── Mobile Drawer ───────── */}
       <Drawer
         anchor={isRTL ? "right" : "left"}
         open={open}
@@ -181,7 +232,7 @@ export default function Navbar() {
           sx: {
             width: 260,
             p: 2,
-            background: mode === "dark" ? "#111" : "#f8f8f8",
+            background: mode === "dark" ? "#111" : "#fafafa",
           },
         }}
       >
@@ -193,11 +244,7 @@ export default function Navbar() {
 
         <List sx={{ mt: 1 }}>
           {links.map((item) => (
-            <ListItemButton
-              key={item.id}
-              onClick={() => scrollTo(item.id)}
-              sx={{ textAlign: isRTL ? "right" : "left" }}
-            >
+            <ListItemButton key={item.id} onClick={() => scrollTo(item.id)}>
               <ListItemText primary={item.label} />
             </ListItemButton>
           ))}
