@@ -123,3 +123,68 @@ a {
     color-scheme: dark;
   }
 }
+/* =========================================================
+   FULL NEXT.JS DEV OVERLAY REMOVAL (NUKE MODE)
+   Removes: black N bubble, route announcer, toasts, overlays,
+   dev tools buttons, inspector, badges, ANY auto UI from Next.js
+   ========================================================= */
+
+/* 1. Next.js Route Announcer (the floating black N) */
+#next-route-announcer,
+#next-route-announcer * {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  z-index: -999999 !important;
+}
+
+/* 2. The hidden dev tools DOM element */
+.nextjs-devtools-container,
+.nextjs-devtools-container * {
+  display: none !important;
+}
+
+/* 3. Next.js dev toasts */
+[data-nextjs-toast],
+[data-nextjs-toast] * {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* 4. Next.js badges */
+[data-nextjs-badge],
+[data-nextjs-badge] * {
+  display: none !important;
+}
+
+/* 5. The <nextjs-portal> wrapper */
+nextjs-portal,
+nextjs-portal * {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* 6. Next.js overlays */
+#__next-build-watcher,
+#__next-build-watcher * {
+  display: none !important;
+}
+
+#__next_css_remove__ *,
+#__next_css_remove__ {
+  display: none !important;
+}
+
+/* 7. Generic catch-all for any injected Next.js floating element */
+[id^="__next"] div[style*="position: fixed"],
+[id^="__next"] div[style*="position: absolute"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
