@@ -123,10 +123,10 @@ export default function Navbar() {
           {/* ───────── Logo ───────── */}
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Image
-              src={mode === "dark" ? "/logo-dark.png" : "/logo.png"}
+              src={mode === "dark" ? "/logo-dark.svg" : "/logo.svg"}
               alt="Logo"
-              width={42}
-              height={42}
+              width={80}
+              height={80}
               style={{ cursor: "pointer" }}
               onClick={() => scrollTo("#hero")}
             />
