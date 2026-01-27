@@ -1,0 +1,22 @@
+<svg width="360" height="320" viewBox="0 0 360 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad1" x1="0" y1="0" x2="360" y2="320" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#4A6CFF"/>
+      <stop offset="100%" stop-color="#8AB4FF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background soft blob -->
+  <path d="M40 180C40 110 100 40 180 40C260 40 320 110 320 180C320 240 260 280 180 280C100 280 40 240 40 180Z"
+        fill="url(#grad1)" opacity="0.18"/>
+
+  <!-- Main circle -->
+  <circle cx="180" cy="150" r="70" fill="url(#grad1)" opacity="0.8"/>
+
+  <!-- Inner accent circle -->
+  <circle cx="180" cy="150" r="32" fill="white" opacity="0.9"/>
+
+  <!-- Bottom bars -->
+  <rect x="110" y="250" width="160" height="14" rx="7" fill="#D6E2FF"/>
+  <rect x="140" y="272" width="100" height="14" rx="7" fill="#E7EEFF"/>
+</svg>

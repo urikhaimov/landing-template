@@ -206,3 +206,10 @@ nextjs-portal * {
   outline: 3px solid #1976d2;
   outline-offset: 3px;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0ms !important;
+    transition-duration: 0ms !important;
+  }
+}
