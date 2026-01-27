@@ -131,8 +131,8 @@ export default function Navbar() {
             <Image
               src={mode === "dark" ? "/logo-dark.svg" : "/logo.svg"}
               alt="Website Logo"
-              width={42}
-              height={42}
+              width={82}
+              height={82}
               priority
               style={{ cursor: "pointer" }}
               onClick={() => scrollTo("#hero")}
