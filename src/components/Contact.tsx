@@ -12,13 +12,11 @@ interface FormValues {
 }
 
 export default function Contact() {
-  const { ui, lang } = useContext(AppContext);
+  const { ui, lang } = useContext(AppContext)!;
   const { register, handleSubmit, reset } = useForm<FormValues>();
 
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<"success" | "error" | null>(null);
-
-  const rtl = lang === "he";
 
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
@@ -38,7 +36,7 @@ export default function Contact() {
       } else {
         throw new Error(result.error);
       }
-    } catch (err) {
+    } catch {
       setStatus("error");
     }
 
@@ -46,103 +44,84 @@ export default function Contact() {
   };
 
   return (
-    <Box id="contact" sx={{ py: 10, px: 2 }}>
-      <Typography
-        variant="h4"
-        sx={{
-          textAlign: "center",
-          fontWeight: "bold",
-          mb: 6,
-        }}
-      >
-        {ui.contactTitle}
-      </Typography>
+    <section id="contact" aria-labelledby="contact-title">
+      <Box sx={{ py: 10, px: 2 }}>
+        <Typography
+          id="contact-title"
+          variant="h4"
+          component="h2"
+          sx={{ textAlign: "center", fontWeight: "bold", mb: 6 }}
+        >
+          {ui.contactTitle}
+        </Typography>
 
-      <Box
-        component="form"
-        onSubmit={handleSubmit(onSubmit)}
-        sx={{
-          maxWidth: 500,
-          mx: "auto",
-          display: "flex",
-          flexDirection: "column",
-          gap: 3,
-          direction: rtl ? "rtl" : "ltr",
-        }}
-      >
-        {/* NAME FIELD */}
-        <TextField
-          label={rtl ? "שם" : "Name"}
-          {...register("name", { required: true })}
-          required
-          InputLabelProps={{
-            sx: {
-              right: rtl ? 18 : "auto",
-              left: rtl ? "auto" : 14,
-              transformOrigin: rtl ? "top right" : "top left",
-            },
+        <Box
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
+          sx={{
+            maxWidth: 500,
+            mx: "auto",
+            display: "flex",
+            flexDirection: "column",
+            gap: 3,
+            direction: lang === "he" ? "rtl" : "ltr",
           }}
-          inputProps={{
-            style: { textAlign: rtl ? "right" : "left" },
-          }}
-        />
+          aria-describedby="contact-description"
+        >
+          <TextField
+            label={lang === "he" ? "שם" : "Name"}
+            {...register("name", { required: true })}
+            id="contact-name"
+            aria-required="true"
+            required
+          />
 
-        {/* EMAIL FIELD */}
-        <TextField
-          type="email"
-          label={rtl ? "אימייל" : "Email"}
-          {...register("email", { required: true })}
-          required
-          InputLabelProps={{
-            sx: {
-              right: rtl ? 18 : "auto",
-              left: rtl ? "auto" : 18,
-              transformOrigin: rtl ? "top right" : "top left",
-            },
-          }}
-          inputProps={{
-            style: { textAlign: rtl ? "right" : "left" },
-          }}
-        />
+          <TextField
+            type="email"
+            label={lang === "he" ? "אימייל" : "Email"}
+            {...register("email", { required: true })}
+            id="contact-email"
+            aria-required="true"
+            required
+          />
 
-        {/* MESSAGE FIELD */}
-        <TextField
-          multiline
-          rows={4}
-          label={rtl ? "הודעה..." : "Message..."}
-          {...register("message", { required: true })}
-          required
-          InputLabelProps={{
-            sx: {
-              right: rtl ? 18 : "auto",
-              left: rtl ? "auto" : 18,
-              transformOrigin: rtl ? "top right" : "top left",
-            },
-          }}
-          inputProps={{
-            style: { textAlign: rtl ? "right" : "left" },
-          }}
-        />
+          <TextField
+            label={lang === "he" ? "הודעה" : "Message"}
+            {...register("message", { required: true })}
+            id="contact-message"
+            aria-required="true"
+            multiline
+            rows={4}
+            required
+          />
 
-        {/* SUCCESS ALERT */}
-        {status === "success" && (
-          <Alert severity="success">
-            {rtl ? "ההודעה נשלחה!" : "Message sent!"}
-          </Alert>
-        )}
+          {status === "success" && (
+            <Alert severity="success" aria-live="polite">
+              {lang === "he" ? "ההודעה נשלחה!" : "Message sent!"}
+            </Alert>
+          )}
 
-        {/* ERROR ALERT */}
-        {status === "error" && (
-          <Alert severity="error">
-            {rtl ? "שגיאה בשליחה" : "Error sending message"}
-          </Alert>
-        )}
+          {status === "error" && (
+            <Alert severity="error" aria-live="assertive">
+              {lang === "he" ? "שגיאה בשליחה" : "Error sending message"}
+            </Alert>
+          )}
 
-        {/* SUBMIT BUTTON */}
-        <Button type="submit" variant="contained" disabled={loading}>
-          {loading ? (rtl ? "שולח..." : "Sending...") : ui.contactSend}
-        </Button>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            disabled={loading}
+            aria-label={ui.contactSend}
+          >
+            {loading
+              ? lang === "he"
+                ? "שולח..."
+                : "Sending..."
+              : ui.contactSend}
+          </Button>
+        </Box>
       </Box>
-    </Box>
+    </section>
   );
 }

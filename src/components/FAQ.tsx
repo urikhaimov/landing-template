@@ -11,58 +11,56 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { motion } from "framer-motion";
 import { useContext } from "react";
 import { AppContext } from "../lib/AppContext";
-import type { FAQItem } from "../lib/i18n";
 
 export default function FAQ() {
-  const context = useContext(AppContext);
-  if (!context) return null;
-
-  const { ui, lang } = context;
+  const { ui, lang } = useContext(AppContext)!;
 
   return (
-    <Box 
-      id="faq"
-     sx={{ py: 10, px: 2 }}>
-      <Typography
-        variant="h4"
-        sx={{ textAlign: "center", fontWeight: "bold", mb: 6 }}
-      >
-        {ui.faqTitle}
-      </Typography>
+    <section id="faq" aria-labelledby="faq-title">
+      <Box sx={{ py: 10, px: 2 }}>
+        <Typography
+          id="faq-title"
+          variant="h4"
+          component="h2"
+          sx={{ textAlign: "center", fontWeight: "bold", mb: 6 }}
+        >
+          {ui.faqTitle}
+        </Typography>
 
-      <Box
-        sx={{
-          maxWidth: 700,
-          mx: "auto",
-          direction: lang === "he" ? "rtl" : "ltr",
-        }}
-      >
-        {ui.faq.map((item: FAQItem, index: number) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: index * 0.15, duration: 0.4 }}
-          >
-            <Accordion
-              sx={{
-                mb: 2,
-                borderRadius: 2,
-                overflow: "hidden",
-              }}
+        <Box
+          sx={{
+            maxWidth: 700,
+            mx: "auto",
+            direction: lang === "he" ? "rtl" : "ltr",
+          }}
+        >
+          {ui.faq.map((item, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.15, duration: 0.4 }}
             >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography sx={{ fontWeight: 600 }}>{item.q}</Typography>
-              </AccordionSummary>
+              <Accordion disableGutters>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls={`faq-panel-${index}`}
+                  id={`faq-header-${index}`}
+                >
+                  <Typography sx={{ fontWeight: "600" }}>
+                    {item.q}
+                  </Typography>
+                </AccordionSummary>
 
-              <AccordionDetails>
-                <Typography sx={{ opacity: 0.9 }}>{item.a}</Typography>
-              </AccordionDetails>
-            </Accordion>
-          </motion.div>
-        ))}
+                <AccordionDetails>
+                  <Typography sx={{ opacity: 0.9 }}>{item.a}</Typography>
+                </AccordionDetails>
+              </Accordion>
+            </motion.div>
+          ))}
+        </Box>
       </Box>
-    </Box>
+    </section>
   );
 }

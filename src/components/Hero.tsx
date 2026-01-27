@@ -6,41 +6,81 @@ import { useContext } from "react";
 import { AppContext } from "../lib/AppContext";
 
 export default function Hero() {
-const { ui, toggleLang, toggleMode, mode } = useContext(AppContext);
+  const { ui, toggleLang, toggleMode, mode, lang } = useContext(AppContext)!;
 
   return (
-    <Box
-      sx={{
-        position: "relative",
-       
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        textAlign: "center",
-        color: (theme) => theme.palette.text.primary,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        px: 2,
-      }}
+    <section
+      id="hero"
+      aria-labelledby="hero-title"
+      style={{ position: "relative" }}
     >
-      <motion.div
-        initial={{ opacity: 0, y: -40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1 }}
-      >
-        <Typography
-          variant="h2"
-          sx={{ fontWeight: "bold", mb: 2 }}
-        >
-          {ui.heroTitle}
-        </Typography>
-
-        <Typography variant="h5" sx={{ mb: 4 }}>
-          {ui.heroSubtitle}
-        </Typography>
-
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          textAlign: "center",
        
-      </motion.div>
-    </Box>
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          px: 2,
+          direction: lang === "he" ? "rtl" : "ltr",
+        }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: -40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <Typography
+            id="hero-title"
+            variant="h2"
+            component="h1"
+            sx={{ fontWeight: "bold", mb: 2 }}
+          >
+            {ui.heroTitle}
+          </Typography>
+
+          <Typography variant="h5" sx={{ mb: 4 }}>
+            {ui.heroSubtitle}
+          </Typography>
+
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              aria-label={ui.callToAction}
+              href="#contact"
+            >
+              {ui.callToAction}
+            </Button>
+
+            <Button
+              variant="outlined"
+              onClick={toggleLang}
+              aria-label="Toggle language"
+            >
+              {ui.toggleLang}
+            </Button>
+
+            <Button
+              variant="outlined"
+              onClick={toggleMode}
+              aria-label="Toggle theme"
+            >
+              {ui.getToggleThemeLabel(mode)}
+            </Button>
+          </Box>
+        </motion.div>
+      </Box>
+    </section>
   );
 }

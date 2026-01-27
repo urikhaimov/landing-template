@@ -2,23 +2,27 @@
 
 import { useContext, useEffect } from "react";
 import { ThemeProvider, CssBaseline } from "@mui/material";
-import { AppContext } from "@/lib/AppContext";
-import { lightTheme, darkTheme } from "@/lib/theme";
+import { AppContext } from "../lib/AppContext";
+import { lightTheme, darkTheme } from "../lib/theme";
 
 export default function ThemeWrapper({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const context = useContext(AppContext);
-  if (!context) return null;
+  const ctx = useContext(AppContext);
 
-  const { mode, lang } = context;
-
-  // Fix RTL direction on first render
+  // Always call hooks BEFORE conditionally returning!
   useEffect(() => {
-    document.documentElement.dir = lang === "he" ? "rtl" : "ltr";
-  }, [lang]);
+    if (ctx) {
+      document.documentElement.setAttribute("data-theme", ctx.mode);
+    }
+  }, [ctx?.mode]);
+
+  // Now safe to branch AFTER hooks
+  if (!ctx) return null;
+
+  const { mode } = ctx;
 
   return (
     <ThemeProvider theme={mode === "light" ? lightTheme : darkTheme}>

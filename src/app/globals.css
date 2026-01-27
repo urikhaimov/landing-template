@@ -188,3 +188,21 @@ nextjs-portal * {
   visibility: hidden !important;
   pointer-events: none !important;
 }
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #005fcc;
+  color: white;
+  padding: 8px 12px;
+  z-index: 9999;
+  transition: top .2s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+*:focus-visible {
+  outline: 3px solid #1976d2;
+  outline-offset: 3px;
+}

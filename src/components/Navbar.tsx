@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useRef, useEffect } from "react";
 import Image from "next/image";
 import {
   AppBar,
@@ -9,9 +9,9 @@ import {
   IconButton,
   Toolbar,
   Drawer,
+  List,
   ListItemButton,
   ListItemText,
-  List,
 } from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
@@ -22,57 +22,58 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import { AppContext } from "../lib/AppContext";
 
 export default function Navbar() {
-  const { ui, toggleLang, toggleMode, mode, lang } = useContext(AppContext);
-  const isRTL = lang === "he";
+  const { ui, toggleLang, toggleMode, mode, lang } = useContext(AppContext)!;
 
   const [open, setOpen] = useState(false);
-  const [hidden, setHidden] = useState(false);
-  const [lastY, setLastY] = useState(0);
-  const [active, setActive] = useState<string>("hero");
 
-  /* ────────────────────────────────
-     ACTIVE SECTION (Scroll Spy)
-  ───────────────────────────────── */
+  // Drawer ref for focus trap
+  const drawerRef = useRef<HTMLDivElement | null>(null);
+
+  // Close drawer with Escape key
   useEffect(() => {
-    const handleSpy = () => {
-      const sections = ["hero", "services", "testimonials", "faq", "contact"];
-      let current = "hero";
+    if (!open) return;
 
-      for (const id of sections) {
-        const el = document.getElementById(id);
-        if (!el) continue;
-
-        const rect = el.getBoundingClientRect();
-        if (rect.top <= 160 && rect.bottom >= 160) {
-          current = id;
-        }
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setOpen(false);
       }
+    }
 
-      setActive(current);
-    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [open]);
 
-    window.addEventListener("scroll", handleSpy);
-    return () => window.removeEventListener("scroll", handleSpy);
-  }, []);
-
-  /* ────────────────────────────────
-     Hide navbar on scroll down
-  ───────────────────────────────── */
+  // Simple focus trap for mobile drawer
   useEffect(() => {
-    const handleScroll = () => {
-      const y = window.scrollY;
-      if (y > lastY && y > 120) setHidden(true);
-      else setHidden(false);
-      setLastY(y);
-    };
+    if (!open || !drawerRef.current) return;
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastY]);
+    const focusable = drawerRef.current.querySelectorAll<HTMLElement>(
+      'button, a, [tabindex="0"]'
+    );
 
-  /* ────────────────────────────────
-     Smooth scrolling
-  ───────────────────────────────── */
+    if (focusable.length === 0) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    function trap(e: KeyboardEvent) {
+      if (e.key !== "Tab") return;
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+
+    window.addEventListener("keydown", trap);
+    first.focus();
+
+    return () => window.removeEventListener("keydown", trap);
+  }, [open]);
+
   const scrollTo = (id: string) => {
     const el = document.querySelector(id);
     if (!el) return;
@@ -81,140 +82,130 @@ export default function Navbar() {
   };
 
   const links = [
-    { id: "#services", key: "services", label: ui.servicesTitle },
-    { id: "#testimonials", key: "testimonials", label: ui.reviewsTitle },
-    { id: "#faq", key: "faq", label: ui.faqTitle },
-    { id: "#contact", key: "contact", label: ui.callToAction },
+    { id: "#services", label: ui.servicesTitle },
+    { id: "#testimonials", label: ui.reviewsTitle },
+    { id: "#faq", label: ui.faqTitle },
+    { id: "#contact", label: ui.callToAction },
   ];
 
   return (
     <>
+      {/* Accessible skip link */}
+      <a
+        href="#main-content"
+        className="skip-link"
+        aria-label={lang === "he" ? "דלג לתוכן" : "Skip to main content"}
+      >
+        Skip to content
+      </a>
+
       <AppBar
+        component="header"
         position="fixed"
+        role="navigation"
+        aria-label="Main navigation"
         elevation={0}
         sx={{
-          top: hidden ? "-95px" : "0",
-          transition: "top 0.35s ease, background 0.25s ease",
           background:
             mode === "dark"
-              ? "rgba(20,20,20,0.70)"
-              : "rgba(255,255,255,0.70)",
+              ? "rgba(10,10,10,0.6)"
+              : "rgba(255,255,255,0.6)",
           backdropFilter: "blur(14px)",
           borderBottom:
             mode === "dark"
-              ? "1px solid rgba(80,80,80,0.25)"
+              ? "1px solid rgba(255,255,255,0.07)"
               : "1px solid rgba(0,0,0,0.07)",
-          height: 78,
-          zIndex: 2000,
         }}
       >
         <Toolbar
           sx={{
-            maxWidth: "1400px",
-            mx: "auto",
-            width: "100%",
-            px: 2,
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center",
-            flexDirection: isRTL ? "row-reverse" : "row",
+            height: 70,
+            px: 2,
+            flexDirection: lang === "he" ? "row-reverse" : "row",
           }}
         >
-          {/* ───────── Logo ───────── */}
+          {/* Logo */}
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Image
               src={mode === "dark" ? "/logo-dark.svg" : "/logo.svg"}
-              alt="Logo"
-              width={80}
-              height={80}
+              alt="Website Logo"
+              width={42}
+              height={42}
+              priority
               style={{ cursor: "pointer" }}
               onClick={() => scrollTo("#hero")}
             />
           </Box>
 
-          {/* ───────── Desktop Menu ───────── */}
+          {/* Desktop Menu */}
           <Box
+            component="nav"
+            aria-label="Primary"
             sx={{
               display: { xs: "none", md: "flex" },
               alignItems: "center",
-              gap: 3,
-              mx: "auto",
-              direction: isRTL ? "rtl" : "ltr",
+              gap: 2,
             }}
           >
-            {links.map((item) => {
-              const isActive = item.key === active;
-              return (
-                <Box
-                  key={item.id}
-                  onClick={() => scrollTo(item.id)}
-                  sx={{
-                    cursor: "pointer",
-                    position: "relative",
-                    fontWeight: isActive ? 700 : 500,
-                    fontSize: isActive ? "1rem" : "0.95rem",
-                    color: mode === "dark" ? "#fff" : "#000",
-                    opacity: isActive ? 1 : 0.8,
-                    transition: "0.25s",
-                    paddingBottom: "4px",
-                    "&:hover": {
-                      opacity: 1,
-                      transform: "translateY(-2px)",
-                    },
-                    "&::after": {
-                      content: '""',
-                      position: "absolute",
-                      bottom: 0,
-                      [isRTL ? "right" : "left"]: 0,
-                      width: isActive ? "100%" : "0%",
-                      height: "3px",
-                      background:
-                        mode === "dark" ? "cyan" : "dodgerblue",
-                      borderRadius: "2px",
-                      transition: "width 0.3s ease",
-                    },
-                    "&:hover::after": {
-                      width: "100%",
-                    },
-                  }}
-                >
-                  {item.label}
-                </Box>
-              );
-            })}
-          </Box>
+            {links.map((link) => (
+              <Button
+                key={link.id}
+                onClick={() => scrollTo(link.id)}
+                aria-label={link.label}
+                sx={{
+                  fontWeight: 500,
+                  opacity: 0.9,
+                  "&:hover": { opacity: 1 },
+                }}
+              >
+                {link.label}
+              </Button>
+            ))}
 
-          {/* ───────── Desktop Actions ───────── */}
-          <Box
-            sx={{
-              display: { xs: "none", md: "flex" },
-              alignItems: "center",
-              gap: 1.5,
-            }}
-          >
-            <Button variant="outlined" onClick={toggleLang} size="small">
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={toggleLang}
+              aria-label="Toggle Language"
+            >
               {ui.toggleLang}
             </Button>
 
-            <Button variant="outlined" onClick={toggleMode} size="small">
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={toggleMode}
+              aria-label="Toggle Theme"
+            >
               {ui.getToggleThemeLabel(mode)}
             </Button>
 
+            {/* WhatsApp */}
             <IconButton
               href="https://wa.me/972547401813"
               target="_blank"
+              aria-label="WhatsApp"
               sx={{ color: "#25D366" }}
             >
               <WhatsAppIcon />
             </IconButton>
 
-            <IconButton href="tel:+972547401813">
+            {/* Phone */}
+            <IconButton
+              href="tel:+972547401813"
+              aria-label="Call phone"
+            >
               <PhoneIcon />
             </IconButton>
           </Box>
 
-          {/* ───────── Mobile Menu Button ───────── */}
+          {/* Mobile Menu Button */}
           <IconButton
+            aria-label="Open menu"
+            aria-controls="mobile-menu"
+            aria-expanded={open}
             sx={{ display: { xs: "flex", md: "none" } }}
             onClick={() => setOpen(true)}
           >
@@ -223,12 +214,16 @@ export default function Navbar() {
         </Toolbar>
       </AppBar>
 
-      {/* ───────── Mobile Drawer ───────── */}
+      {/* Mobile Drawer */}
       <Drawer
-        anchor={isRTL ? "right" : "left"}
+        id="mobile-menu"
+        anchor={lang === "he" ? "right" : "left"}
+        role="dialog"
+        aria-modal="true"
         open={open}
         onClose={() => setOpen(false)}
         PaperProps={{
+          ref: drawerRef,
           sx: {
             width: 260,
             p: 2,
@@ -236,28 +231,59 @@ export default function Navbar() {
           },
         }}
       >
-        <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <IconButton onClick={() => setOpen(false)}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
+        {/* Close button */}
+        <IconButton
+          aria-label="Close menu"
+          onClick={() => setOpen(false)}
+          sx={{ alignSelf: "flex-end" }}
+        >
+          <CloseIcon />
+        </IconButton>
 
-        <List sx={{ mt: 1 }}>
-          {links.map((item) => (
-            <ListItemButton key={item.id} onClick={() => scrollTo(item.id)}>
-              <ListItemText primary={item.label} />
+        {/* Links */}
+        <List>
+          {links.map((link) => (
+            <ListItemButton
+              key={link.id}
+              onClick={() => scrollTo(link.id)}
+              aria-label={link.label}
+            >
+              <ListItemText primary={link.label} />
             </ListItemButton>
           ))}
 
-          <ListItemButton onClick={toggleLang}>
+          <ListItemButton onClick={toggleLang} aria-label="Toggle language">
             <ListItemText primary={ui.toggleLang} />
           </ListItemButton>
 
-          <ListItemButton onClick={toggleMode}>
+          <ListItemButton onClick={toggleMode} aria-label="Toggle theme">
             <ListItemText primary={ui.getToggleThemeLabel(mode)} />
           </ListItemButton>
         </List>
       </Drawer>
+
+      {/* Floating WhatsApp Bubble */}
+      <IconButton
+        href="https://wa.me/972547401813"
+        target="_blank"
+        aria-label="WhatsApp floating button"
+        sx={{
+          position: "fixed",
+          bottom: 24,
+          right: 24,
+          bgcolor: "#25D366",
+          width: 58,
+          height: 58,
+          borderRadius: "50%",
+          color: "#fff",
+          boxShadow: "0 6px 20px rgba(0,0,0,0.25)",
+          zIndex: 2000,
+          "&:hover": { transform: "scale(1.07)" },
+          transition: "0.2s ease",
+        }}
+      >
+        <WhatsAppIcon sx={{ fontSize: 34 }} />
+      </IconButton>
     </>
   );
 }
