@@ -1,14 +1,41 @@
+// Force Node.js runtime (required for Nodemailer on Vercel)
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
+type ContactFormBody = {
+  name: string;
+  email: string;
+  message: string;
+};
+
 export async function POST(request: Request) {
   try {
-    const { name, email, message } = await request.json();
+    const body = (await request.json()) as ContactFormBody;
+    const { name, email, message } = body;
 
     if (!name || !email || !message) {
       return NextResponse.json(
         { success: false, error: "Missing fields" },
         { status: 400 }
+      );
+    }
+
+    // Validate environment variables
+    if (
+      !process.env.SMTP_HOST ||
+      !process.env.SMTP_PORT ||
+      !process.env.SMTP_USER ||
+      !process.env.SMTP_PASS ||
+      !process.env.CONTACT_TO_EMAIL
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "SMTP configuration missing on server",
+        },
+        { status: 500 }
       );
     }
 
@@ -46,10 +73,8 @@ ${message}
   } catch (error: unknown) {
     console.error("Email send error:", error);
 
-    let message = "Unknown error";
-    if (error instanceof Error) {
-      message = error.message;
-    }
+    const message =
+      error instanceof Error ? error.message : "Unknown error occurred";
 
     return NextResponse.json(
       { success: false, error: message },
