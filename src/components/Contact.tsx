@@ -1,23 +1,17 @@
 "use client";
 
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Alert,
-  FormHelperText,
-} from "@mui/material";
+import { Box, Typography, TextField, Button, Alert } from "@mui/material";
 import { useForm } from "react-hook-form";
-import { useState, useContext } from "react";
+import { useState, useContext, useRef, useEffect } from "react";
 import { AppContext } from "../lib/AppContext";
-import { motion } from "framer-motion";
 
 interface FormValues {
   name: string;
   email: string;
   message: string;
 }
+
+type FieldName = keyof FormValues;
 
 export default function Contact() {
   const { ui, lang } = useContext(AppContext)!;
@@ -26,41 +20,35 @@ export default function Contact() {
     register,
     handleSubmit,
     formState: { errors },
-    trigger,
     reset,
-  } = useForm<FormValues>();
+  } = useForm<FormValues>({ mode: "onSubmit" });
 
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<"success" | "error" | null>(null);
 
-  // Shake animation
-  const shake = {
-    animate: (err: boolean) =>
-      err
-        ? {
-            x: [-6, 6, -6, 6, 0],
-            transition: { duration: 0.3 },
-          }
-        : {},
+  // Refs for scrolling to the first invalid field
+  const nameRef = useRef<HTMLInputElement | null>(null);
+  const emailRef = useRef<HTMLInputElement | null>(null);
+  const messageRef = useRef<HTMLInputElement | null>(null);
+
+  const fieldRefs: Record<FieldName, React.RefObject<HTMLInputElement | null>> = {
+    name: nameRef,
+    email: emailRef,
+    message: messageRef,
   };
 
-  // Static layout CSS (NOT in <motion.div style>)
-  const fieldWrapper = {
-    width: "100%",
-    maxWidth: "500px",
-    position: "relative",
-    margin: "0 auto",
-  };
+  // Auto-scroll to first validation error
+  useEffect(() => {
+    const firstError = Object.keys(errors)[0] as FieldName | undefined;
 
-  const helperStyle = {
-    position: "absolute",
-    bottom: "-22px",
-    fontSize: "0.75rem",
-    color: "error.main",
-    ...(lang === "he"
-      ? { right: 0, textAlign: "right" }
-      : { left: 0, textAlign: "left" }),
-  };
+    if (!firstError) return;
+
+    const ref = fieldRefs[firstError];
+    if (ref?.current) {
+      ref.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      ref.current.focus();
+    }
+  }, [errors, fieldRefs]);
 
   // Submit handler
   const onSubmit = async (data: FormValues) => {
@@ -108,95 +96,74 @@ export default function Contact() {
             mx: "auto",
             display: "flex",
             flexDirection: "column",
-            gap: 5,
+            gap: 3,
             direction: lang === "he" ? "rtl" : "ltr",
           }}
         >
           {/* NAME */}
-          <motion.div animate={shake.animate(!!errors.name)}>
-            <Box sx={fieldWrapper}>
-              <TextField
-                fullWidth
-                label={lang === "he" ? "שם *" : "Name *"}
-                {...register("name", {
-                  required: lang === "he" ? "נא למלא את השם" : "Name is required",
-                  minLength: {
-                    value: 2,
-                    message: lang === "he" ? "השם קצר מדי" : "Name is too short",
-                  },
-                })}
-                error={!!errors.name}
-                onBlur={() => trigger("name")}
-              />
-              {errors.name && (
-                <FormHelperText sx={helperStyle}>
-                  {errors.name.message}
-                </FormHelperText>
-              )}
-            </Box>
-          </motion.div>
+          <TextField
+            inputRef={nameRef}
+            label={lang === "he" ? "שם" : "Name"}
+            {...register("name", {
+              required: lang === "he" ? "אנא הזן שם" : "Name is required",
+              minLength: {
+                value: 2,
+                message:
+                  lang === "he" ? "השם קצר מדי" : "Name is too short",
+              },
+            })}
+            error={Boolean(errors.name)}
+            helperText={errors.name?.message}
+          />
 
           {/* EMAIL */}
-          <motion.div animate={shake.animate(!!errors.email)}>
-            <Box sx={fieldWrapper}>
-              <TextField
-                fullWidth
-                type="email"
-                label={lang === "he" ? "אימייל *" : "Email *"}
-                {...register("email", {
-                  required: lang === "he" ? "נא למלא אימייל" : "Email is required",
-                  pattern: {
-                    value: /\S+@\S+\.\S+/,
-                    message:
-                      lang === "he" ? "האימייל אינו תקין" : "Invalid email",
-                  },
-                })}
-                error={!!errors.email}
-                onBlur={() => trigger("email")}
-              />
-              {errors.email && (
-                <FormHelperText sx={helperStyle}>
-                  {errors.email.message}
-                </FormHelperText>
-              )}
-            </Box>
-          </motion.div>
+          <TextField
+            inputRef={emailRef}
+            type="email"
+            label={lang === "he" ? "אימייל" : "Email"}
+            {...register("email", {
+              required: lang === "he" ? "אנא הזן אימייל" : "Email is required",
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message:
+                  lang === "he" ? "אימייל לא תקין" : "Invalid email address",
+              },
+            })}
+            error={Boolean(errors.email)}
+            helperText={errors.email?.message}
+          />
 
           {/* MESSAGE */}
-          <motion.div animate={shake.animate(!!errors.message)}>
-            <Box sx={fieldWrapper}>
-              <TextField
-                fullWidth
-                multiline
-                rows={4}
-                label={lang === "he" ? "הודעה *" : "Message *"}
-                {...register("message", {
-                  required:
-                    lang === "he" ? "נא לכתוב הודעה" : "Message is required",
-                  minLength: {
-                    value: 5,
-                    message:
-                      lang === "he" ? "ההודעה קצרה מדי" : "Message is too short",
-                  },
-                })}
-                error={!!errors.message}
-                onBlur={() => trigger("message")}
-              />
-              {errors.message && (
-                <FormHelperText sx={helperStyle}>
-                  {errors.message.message}
-                </FormHelperText>
-              )}
-            </Box>
-          </motion.div>
+          <TextField
+            inputRef={messageRef}
+            label={lang === "he" ? "הודעה" : "Message"}
+            multiline
+            rows={4}
+            {...register("message", {
+              required: lang === "he" ? "אנא הזן הודעה" : "Message is required",
+              minLength: {
+                value: 5,
+                message:
+                  lang === "he"
+                    ? "ההודעה קצרה מדי"
+                    : "Message is too short",
+              },
+            })}
+            error={Boolean(errors.message)}
+            helperText={errors.message?.message}
+          />
 
-          {/* NOTIFICATIONS */}
+          {/* STATUS MESSAGES */}
           {status === "success" && (
-            <Alert severity="success">{lang === "he" ? "ההודעה נשלחה!" : "Message sent!"}</Alert>
+            <Alert severity="success" aria-live="polite">
+              {lang === "he" ? "ההודעה נשלחה!" : "Message sent!"}
+            </Alert>
           )}
 
           {status === "error" && (
-            <Alert severity="error">{lang === "he" ? "שגיאה בשליחה" : "Error sending message"}</Alert>
+            <Alert severity="error" aria-live="assertive">
+              {lang === "he" ? "שגיאה בשליחה" : "Error sending message"}
+            </Alert>
           )}
 
           {/* SUBMIT */}
@@ -205,7 +172,8 @@ export default function Contact() {
             variant="contained"
             color="primary"
             disabled={loading}
-            sx={{ height: 50 }}
+            aria-label={ui.contactSend}
+            sx={{ height: 48, fontSize: "1rem" }}
           >
             {loading
               ? lang === "he"
