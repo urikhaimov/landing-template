@@ -26,32 +26,29 @@ export default function Navbar() {
 
   const [open, setOpen] = useState(false);
 
-  // Drawer ref for focus trap
   const drawerRef = useRef<HTMLDivElement | null>(null);
 
-  // Close drawer with Escape key
+  // Handle Escape key to close menu
   useEffect(() => {
     if (!open) return;
 
     function handleKey(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        setOpen(false);
-      }
+      if (e.key === "Escape") setOpen(false);
     }
 
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [open]);
 
-  // Simple focus trap for mobile drawer
+  // Simple focus trap
   useEffect(() => {
     if (!open || !drawerRef.current) return;
 
     const focusable = drawerRef.current.querySelectorAll<HTMLElement>(
-      'button, a, [tabindex="0"]'
+      `button, a, [tabindex="0"]`
     );
 
-    if (focusable.length === 0) return;
+    if (!focusable.length) return;
 
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
@@ -90,7 +87,7 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Accessible skip link */}
+      {/* Skip link */}
       <a
         href="#main-content"
         className="skip-link"
@@ -164,6 +161,7 @@ export default function Navbar() {
               </Button>
             ))}
 
+            {/* Language toggle */}
             <Button
               variant="outlined"
               size="small"
@@ -173,6 +171,7 @@ export default function Navbar() {
               {ui.toggleLang}
             </Button>
 
+            {/* Dark/Light toggle */}
             <Button
               variant="outlined"
               size="small"
@@ -193,10 +192,7 @@ export default function Navbar() {
             </IconButton>
 
             {/* Phone */}
-            <IconButton
-              href="tel:+972547401813"
-              aria-label="Call phone"
-            >
+            <IconButton href="tel:+972547401813" aria-label="Call phone">
               <PhoneIcon />
             </IconButton>
           </Box>
@@ -240,7 +236,7 @@ export default function Navbar() {
           <CloseIcon />
         </IconButton>
 
-        {/* Links */}
+        {/* Drawer Links */}
         <List>
           {links.map((link) => (
             <ListItemButton
@@ -252,38 +248,49 @@ export default function Navbar() {
             </ListItemButton>
           ))}
 
+          {/* Language */}
           <ListItemButton onClick={toggleLang} aria-label="Toggle language">
             <ListItemText primary={ui.toggleLang} />
           </ListItemButton>
 
+          {/* Theme */}
           <ListItemButton onClick={toggleMode} aria-label="Toggle theme">
             <ListItemText primary={ui.getToggleThemeLabel(mode)} />
           </ListItemButton>
+
+          {/* WhatsApp */}
+          <ListItemButton
+            component="a"
+            href="https://wa.me/972547401813"
+            target="_blank"
+            aria-label="WhatsApp"
+          >
+            <WhatsAppIcon
+              sx={{
+                color: "#25D366",
+                mr: lang === "he" ? 0 : 1,
+                ml: lang === "he" ? 1 : 0,
+              }}
+            />
+            <ListItemText primary="WhatsApp" />
+          </ListItemButton>
+
+          {/* Phone */}
+          <ListItemButton
+            component="a"
+            href="tel:+972547401813"
+            aria-label="Call phone"
+          >
+            <PhoneIcon
+              sx={{
+                mr: lang === "he" ? 0 : 1,
+                ml: lang === "he" ? 1 : 0,
+              }}
+            />
+            <ListItemText primary={lang === "he" ? "התקשר" : "Call"} />
+          </ListItemButton>
         </List>
       </Drawer>
-
-      {/* Floating WhatsApp Bubble */}
-      <IconButton
-        href="https://wa.me/972547401813"
-        target="_blank"
-        aria-label="WhatsApp floating button"
-        sx={{
-          position: "fixed",
-          bottom: 24,
-          right: 24,
-          bgcolor: "#25D366",
-          width: 58,
-          height: 58,
-          borderRadius: "50%",
-          color: "#fff",
-          boxShadow: "0 6px 20px rgba(0,0,0,0.25)",
-          zIndex: 2000,
-          "&:hover": { transform: "scale(1.07)" },
-          transition: "0.2s ease",
-        }}
-      >
-        <WhatsAppIcon sx={{ fontSize: 34 }} />
-      </IconButton>
     </>
   );
 }
