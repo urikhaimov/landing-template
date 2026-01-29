@@ -41,10 +41,10 @@ export default function Testimonials() {
 
         <Box
           sx={{
-            maxWidth: 600,
+            maxWidth: 650,
             mx: "auto",
             width: "100%",
-            overflow: "hidden",
+            overflow: "visible", // 🔥 FIX clipping issue
           }}
         >
           <motion.div
@@ -57,17 +57,20 @@ export default function Testimonials() {
               {ui.reviews.map((review, index) => (
                 <Box
                   key={index}
-                  sx={{ px: 2 }}
+                  sx={{ px: 1 }} // smaller padding so border is visible fully
                   role="group"
                   aria-label={`${review.name} - testimonial`}
                 >
                   <Paper
-                    elevation={4}
+                    elevation={3}
                     sx={{
                       p: 4,
                       borderRadius: 3,
                       textAlign: "center",
                       minHeight: 180,
+                      border: "1px solid rgba(0,0,0,0.12)", // 🔥 visible border
+                      backgroundColor: "background.paper",
+                      boxShadow: "0px 4px 20px rgba(0,0,0,0.08)", // 🔥 optional soft shadow
                     }}
                   >
                     <Typography
@@ -80,7 +83,7 @@ export default function Testimonials() {
 
                     <Typography
                       variant="body1"
-                      sx={{ opacity: 0.8 }}
+                      sx={{ opacity: 0.85 }}
                       aria-label="testimonial text"
                     >
                       &ldquo;{review.comment}&rdquo;

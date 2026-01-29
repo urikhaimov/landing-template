@@ -125,14 +125,16 @@ export default function Contact() {
               required: lang === "he" ? "אנא הזן אימייל" : "Email is required",
               pattern: {
                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                message:
-                  lang === "he" ? "אימייל לא תקין" : "Invalid email address",
+                message: lang === "he" ? "אימייל לא תקין" : "Invalid email address",
               },
             })}
             error={Boolean(errors.email)}
             helperText={errors.email?.message}
+            
+            sx={{
+              direction: "rtl",         // 🔥 Hebrew UI direction
+            }}
           />
-
           {/* MESSAGE */}
           <TextField
             inputRef={messageRef}

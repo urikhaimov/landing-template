@@ -42,7 +42,15 @@ export default function FAQ() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.15, duration: 0.4 }}
             >
-              <Accordion disableGutters>
+              <Accordion
+                  key={index}
+                  sx={{
+                    mb: 2, // 🔥 space between questions
+                    borderRadius: 2,
+                    boxShadow: "0px 3px 12px rgba(0,0,0,0.06)",
+                    "&:before": { display: "none" },
+                  }}
+                >
                 <AccordionSummary
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls={`faq-panel-${index}`}
