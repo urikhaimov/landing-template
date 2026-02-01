@@ -56,8 +56,9 @@ export default function Contact() {
     setStatus(null);
 
     try {
-      const res = await fetch("/api/contact", {
+      const res = await fetch("/contact", {
         method: "POST",
+         headers: { "Content-Type": "application/json" }, // 🔥 required
         body: JSON.stringify(data),
       });
 
