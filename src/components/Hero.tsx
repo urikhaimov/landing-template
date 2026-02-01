@@ -44,7 +44,7 @@ export default function Hero() {
             }
             width={360}
             height={320}
-            priority
+           loading="eager"
             style={{ maxWidth: "90%", height: "auto" }}
           />
         </motion.div>
