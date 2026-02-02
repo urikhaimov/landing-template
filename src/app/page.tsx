@@ -8,7 +8,13 @@ import Contact from "@/components/Contact";
 export default function Page() {
   return (
     <main id="main-content" role="main">
-      <Box sx={{ overflowX: "hidden", pt: 10 }}>
+      <Box
+        sx={{
+          overflowX: "hidden",
+          pt: 10,
+          bgcolor: "background.default",  // ★ this makes dark work!
+        }}
+      >
         <Hero />
         <Services />
         <Testimonials />
