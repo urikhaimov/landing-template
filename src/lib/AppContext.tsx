@@ -13,35 +13,40 @@ export interface AppContextType {
 
 export const AppContext = createContext<AppContextType | null>(null);
 
+// Utility to read cookies
+function getCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  return document.cookie
+    .split("; ")
+    .find((row) => row.startsWith(name + "="))
+    ?.split("=")[1] ?? null;
+}
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  // -------------------------------------
-  // Load initial state WITHOUT an effect
-  // Lazy initialization (SSR safe)
-  // -------------------------------------
-  const [lang, setLang] = useState<Locale>(() => {
-    if (typeof window === "undefined") return "he";
-    return (localStorage.getItem("lang") as Locale) || "he";
-  });
+  // SSR-FRIENDLY INITIALIZERS (no window / no localStorage here!)
+  const [lang, setLang] = useState<Locale>("he");
+  const [mode, setMode] = useState<"light" | "dark">("light");
 
-  const [mode, setMode] = useState<"light" | "dark">(() => {
-    if (typeof window === "undefined") return "light";
-    return (localStorage.getItem("mode") as "light" | "dark") || "light";
-  });
-
-  // -------------------------------------
-  // Persist to localStorage when changed
-  // -------------------------------------
+  // Load from cookies on client
   useEffect(() => {
+    const savedLang = getCookie("lang") || localStorage.getItem("lang");
+    const savedMode = getCookie("mode") || localStorage.getItem("mode");
+
+    if (savedLang === "he" || savedLang === "en") setLang(savedLang);
+    if (savedMode === "dark" || savedMode === "light") setMode(savedMode);
+  }, []);
+
+  // Save back into both cookie + localStorage
+  useEffect(() => {
+    document.cookie = `lang=${lang}; path=/; max-age=31536000`;
     localStorage.setItem("lang", lang);
   }, [lang]);
 
   useEffect(() => {
+    document.cookie = `mode=${mode}; path=/; max-age=31536000`;
     localStorage.setItem("mode", mode);
   }, [mode]);
 
-  // -------------------------------------
-  // Memoized context value
-  // -------------------------------------
   const value = useMemo(
     () => ({
       lang,
