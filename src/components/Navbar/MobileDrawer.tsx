@@ -31,7 +31,7 @@ export default function MobileDrawer({ open, onClose }) {
         </Button>
 
         <Button onClick={toggleMode}>
-          {mode === "dark" ? ui.lightMode : ui.darkMode}
+           {ui.getToggleThemeLabel(mode)}
         </Button>
       </Box>
     </Drawer>
