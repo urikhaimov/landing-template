@@ -1,14 +1,14 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useMemo } from "react";
 import {
   ThemeProvider,
-  createTheme,
   CssBaseline,
-  ThemeOptions,
+  StyledEngineProvider,
 } from "@mui/material";
-import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
+import { CacheProvider } from "@emotion/react";
+import { lightTheme, darkTheme } from "@/lib/theme";
 
 export default function ThemeRegistry({
   children,
@@ -21,31 +21,35 @@ export default function ThemeRegistry({
 }) {
   const direction = lang === "he" ? "rtl" : "ltr";
 
-  // Emotion cache must match direction
-  const cache = createCache({
-    key: direction === "rtl" ? "mui-rtl" : "mui-ltr",
-    prepend: true,
-  });
-  cache.compat = true;
+  // ------------------------------------------------------------------
+  // 🔥 IMPORTANT: Emotion Cache MUST be stable across SSR + Client
+  // ------------------------------------------------------------------
+  const cache = useMemo(
+    () =>
+      createCache({
+        key: direction === "rtl" ? "mui-rtl" : "mui-ltr",
+        prepend: true, // ensures styles load FIRST -> prevents unstyled page
+      }),
+    [direction]
+  );
 
-  const themeOptions: ThemeOptions = {
-    direction,
-    palette: {
-      mode,
-    },
-    typography: {
-      fontFamily: lang === "he" ? "Alef, sans-serif" : "Inter, sans-serif",
-    },
-  };
-
-  const theme = createTheme(themeOptions);
+  // ------------------------------------------------------------------
+  // 🔥 Choose existing theme and inject dynamic direction
+  // ------------------------------------------------------------------
+  const theme = useMemo(() => {
+    const base = mode === "dark" ? darkTheme : lightTheme;
+    return { ...base, direction };
+  }, [mode, direction]);
 
   return (
     <CacheProvider value={cache}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        {children}
-      </ThemeProvider>
+      {/* Inject MUI styles FIRST before anything else */}
+      <StyledEngineProvider injectFirst>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          {children}
+        </ThemeProvider>
+      </StyledEngineProvider>
     </CacheProvider>
   );
 }
