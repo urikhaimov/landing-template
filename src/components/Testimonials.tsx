@@ -3,7 +3,7 @@
 import { Box, Paper, Typography } from "@mui/material";
 import Slider from "react-slick";
 import { useContext } from "react";
-import { AppContext } from "../lib/AppContext";
+import AppContext  from "../lib/AppContext";
 import { motion } from "framer-motion";
 
 export default function Testimonials() {

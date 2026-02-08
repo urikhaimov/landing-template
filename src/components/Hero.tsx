@@ -4,7 +4,7 @@ import { Box, Typography, Button } from "@mui/material";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useContext } from "react";
-import { AppContext } from "../lib/AppContext";
+import AppContext  from "../lib/AppContext";
 
 export default function Hero() {
   const { ui, toggleLang, toggleMode, mode, lang } = useContext(AppContext)!;

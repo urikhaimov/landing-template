@@ -3,7 +3,7 @@
 import { Box, Typography, TextField, Button, Alert } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { useState, useContext, useRef, useEffect } from "react";
-import { AppContext } from "../lib/AppContext";
+import AppContext  from "../lib/AppContext";
 
 interface FormValues {
   name: string;

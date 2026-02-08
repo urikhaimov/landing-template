@@ -3,7 +3,7 @@
 import { Box, Typography, Paper } from "@mui/material";
 import { motion } from "framer-motion";
 import { useContext } from "react";
-import { AppContext } from "../lib/AppContext";
+import AppContext  from "../lib/AppContext";
 
 export default function Services() {
   const { ui, lang } = useContext(AppContext)!;

@@ -2,7 +2,7 @@
 
 import { useContext } from "react";
 import { ThemeProvider, CssBaseline } from "@mui/material";
-import { AppContext } from "../lib/AppContext";
+import AppContext  from "../lib/AppContext";
 import { lightTheme, darkTheme } from "../lib/theme";
 
 export default function ThemeFromContext({ children }: { children: React.ReactNode }) {

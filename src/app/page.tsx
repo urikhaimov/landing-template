@@ -1,3 +1,5 @@
+"use client";
+
 import { Box } from "@mui/material";
 import Hero from "@/components/Hero";
 import Services from "@/components/Services";
@@ -7,14 +9,8 @@ import Contact from "@/components/Contact";
 
 export default function Page() {
   return (
-    <main id="main-content" role="main">
-      <Box
-        sx={{
-          overflowX: "hidden",
-          pt: 10,
-          bgcolor: "background.default",  // ★ this makes dark work!
-        }}
-      >
+    <main>
+      <Box sx={{ overflowX: "hidden", pt: 10, bgcolor: "background.default" }}>
         <Hero />
         <Services />
         <Testimonials />

@@ -1,62 +1,52 @@
 "use client";
 
-import { createContext, useState, useEffect, useMemo } from "react";
-import { ui, type Locale, type LanguagePack } from "./i18n";
+import { createContext, useMemo, useState, useEffect } from "react";
+import { ui, type Locale } from "./i18n";
 
 export interface AppContextType {
   lang: Locale;
   mode: "light" | "dark";
-  ui: LanguagePack;
+  ui: typeof ui["he"];
   toggleLang: () => void;
   toggleMode: () => void;
 }
 
-export const AppContext = createContext<AppContextType | null>(null);
+const AppContext = createContext<AppContextType | null>(null);
+export default AppContext;
 
-// Utility to read cookies
-function getCookie(name: string): string | null {
-  if (typeof document === "undefined") return null;
-  return document.cookie
-    .split("; ")
-    .find((row) => row.startsWith(name + "="))
-    ?.split("=")[1] ?? null;
-}
+export function AppProvider({
+  children,
+  initialLang,
+  initialMode,
+}: {
+  children: React.ReactNode;
+  initialLang: Locale;
+  initialMode: "light" | "dark";
+}) {
+  const [lang, setLang] = useState<Locale>(initialLang);
+  const [mode, setMode] = useState<"light" | "dark">(initialMode);
 
-export function AppProvider({ children }: { children: React.ReactNode }) {
-  // SSR-FRIENDLY INITIALIZERS (no window / no localStorage here!)
-  const [lang, setLang] = useState<Locale>("he");
-  const [mode, setMode] = useState<"light" | "dark">("light");
+  const toggleLang = () => {
+    const nextLang = lang === "he" ? "en" : "he";
+    setLang(nextLang);
+    document.cookie = `lang=${nextLang}; path=/`;
+  };
 
-  // Load from cookies on client
-  useEffect(() => {
-    const savedLang = getCookie("lang") || localStorage.getItem("lang");
-    const savedMode = getCookie("mode") || localStorage.getItem("mode");
-
-    if (savedLang === "he" || savedLang === "en") setLang(savedLang);
-    if (savedMode === "dark" || savedMode === "light") setMode(savedMode);
-  }, []);
-
-  // Save back into both cookie + localStorage
-  useEffect(() => {
-    document.cookie = `lang=${lang}; path=/; max-age=31536000`;
-    localStorage.setItem("lang", lang);
-  }, [lang]);
-
-  useEffect(() => {
-    document.cookie = `mode=${mode}; path=/; max-age=31536000`;
-    localStorage.setItem("mode", mode);
-  }, [mode]);
+  const toggleMode = () => {
+    const nextMode = mode === "dark" ? "light" : "dark";
+    setMode(nextMode);
+    document.cookie = `mode=${nextMode}; path=/`;
+  };
 
   const value = useMemo(
     () => ({
       lang,
       mode,
       ui: ui[lang],
-      toggleLang: () => setLang((prev) => (prev === "he" ? "en" : "he")),
-      toggleMode: () =>
-        setMode((prev) => (prev === "light" ? "dark" : "light")),
+      toggleLang,
+      toggleMode,
     }),
-    [lang, mode]
+    [lang, mode] // only primitive state
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -1,45 +1,34 @@
 import "./globals.css";
-import ThemeRegistry from "./ThemeRegistry";
-import { AppProvider } from "../lib/AppContext";
-import ThemeFromContext from "./ThemeFromContext";
-import ClientRoot from "../components/ClientRoot";
+import { cookies } from "next/headers";
+import AppProviderWrapper from "@/components/AppProviderWrapper";
 
 export const metadata = {
-  title: "Landing Pro",
-  description: "Landing Page Generator",
+  title: "My App",
+  description: "My App description",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const cookieStore = await cookies();
+
+  const initialMode =
+    cookieStore.get("mode")?.value === "dark" ? "dark" : "light";
+
+  const initialLang =
+    cookieStore.get("lang")?.value === "en" ? "en" : "he";
+
   return (
-    <html lang="he" dir="rtl">
-       <head>
-        {/* JSON-LD Structured Data */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "Landing Pro",
-              url: "https://your-domain.com",
-              logo: "https://your-domain.com/logo.png",
-              sameAs: [
-                "https://www.facebook.com/",
-                "https://www.instagram.com/",
-                "https://www.linkedin.com/",
-              ],
-            }),
-          }}
-        />
-      </head>
+    <html lang="en" dir="ltr">
       <body>
-        <ThemeRegistry>
-          <AppProvider>
-            <ThemeFromContext>
-              <ClientRoot>{children}</ClientRoot>
-            </ThemeFromContext>
-          </AppProvider>
-        </ThemeRegistry>
+        <AppProviderWrapper
+          initialMode={initialMode}
+          initialLang={initialLang}
+        >
+          {children}
+        </AppProviderWrapper>
       </body>
     </html>
   );

@@ -10,7 +10,7 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { motion } from "framer-motion";
 import { useContext } from "react";
-import { AppContext } from "../lib/AppContext";
+import AppContext  from "../lib/AppContext";
 
 export default function FAQ() {
   const { ui, lang } = useContext(AppContext)!;
