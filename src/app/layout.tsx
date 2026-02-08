@@ -7,22 +7,23 @@ export const metadata = {
   description: "My App description",
 };
 
-export default async function RootLayout({ children }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const cookieStore = await cookies();
 
-  const initialMode =
+  const mode =
     cookieStore.get("mode")?.value === "dark" ? "dark" : "light";
 
-  const initialLang =
+  const lang =
     cookieStore.get("lang")?.value === "he" ? "he" : "en";
 
   return (
-    <html lang={initialLang} dir={initialLang === "he" ? "rtl" : "ltr"}>
+    <html lang={lang} dir={lang === "he" ? "rtl" : "ltr"}>
       <body>
-        <AppProviderWrapper
-          initialMode={initialMode}
-          initialLang={initialLang}
-        >
+        <AppProviderWrapper initialMode={mode} initialLang={lang}>
           {children}
         </AppProviderWrapper>
       </body>

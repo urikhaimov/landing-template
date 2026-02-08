@@ -10,10 +10,15 @@ export default function AppProviderWrapper({
   children,
   initialMode,
   initialLang,
+}: {
+  children: ReactNode;
+  initialMode: "light" | "dark";
+  initialLang: "he" | "en";
 }) {
-  const [mode, setMode] = useState(initialMode);
-  const [lang, setLang] = useState(initialLang);
+  const [mode, setMode] = useState<"light" | "dark">(initialMode);
+  const [lang, setLang] = useState<"he" | "en">(initialLang);
 
+  // Persist theme
   const toggleMode = () => {
     setMode((prev) => {
       const next = prev === "dark" ? "light" : "dark";
@@ -22,6 +27,7 @@ export default function AppProviderWrapper({
     });
   };
 
+  // Persist language
   const toggleLang = () => {
     setLang((prev) => {
       const next = prev === "he" ? "en" : "he";
@@ -30,13 +36,12 @@ export default function AppProviderWrapper({
     });
   };
 
+  // Language pack
   const ui = useMemo(() => LANG_PACKS[lang], [lang]);
 
   return (
-    <AppContext.Provider
-      value={{ mode, lang, ui, toggleMode, toggleLang }}
-    >
-      <ThemeRegistry mode={mode}>
+    <AppContext.Provider value={{ mode, lang, ui, toggleMode, toggleLang }}>
+      <ThemeRegistry mode={mode} lang={lang}>
         <NavbarClientWrapper />
         {children}
       </ThemeRegistry>
