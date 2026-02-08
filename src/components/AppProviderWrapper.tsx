@@ -4,16 +4,12 @@ import AppContext from "@/lib/AppContext";
 import ThemeRegistry from "./ThemeRegistry";
 import NavbarClientWrapper from "./Navbar/NavbarClientWrapper";
 import { ReactNode, useState, useMemo } from "react";
-import { ui as uiPacks } from "@/lib/i18n";
+import { ui as LANG_PACKS } from "@/lib/i18n";
 
 export default function AppProviderWrapper({
   children,
   initialMode,
   initialLang,
-}: {
-  children: ReactNode;
-  initialMode: "light" | "dark";
-  initialLang: "en" | "he";
 }) {
   const [mode, setMode] = useState(initialMode);
   const [lang, setLang] = useState(initialLang);
@@ -28,28 +24,18 @@ export default function AppProviderWrapper({
 
   const toggleLang = () => {
     setLang((prev) => {
-      const next = prev === "en" ? "he" : "en";
+      const next = prev === "he" ? "en" : "he";
       document.cookie = `lang=${next}; path=/; max-age=31536000`;
       return next;
     });
   };
 
-  // 🔥 Get the correct language pack without require()
-  const ui = useMemo(() => uiPacks[lang], [lang]);
-
-  const value = useMemo(
-    () => ({
-      mode,
-      lang,
-      ui,
-      toggleMode,
-      toggleLang,
-    }),
-    [mode, lang, ui]
-  );
+  const ui = useMemo(() => LANG_PACKS[lang], [lang]);
 
   return (
-    <AppContext.Provider value={value}>
+    <AppContext.Provider
+      value={{ mode, lang, ui, toggleMode, toggleLang }}
+    >
       <ThemeRegistry mode={mode}>
         <NavbarClientWrapper />
         {children}
