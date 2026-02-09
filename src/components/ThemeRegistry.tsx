@@ -1,14 +1,9 @@
 "use client";
 
 import { ReactNode, useMemo } from "react";
-import {
-  ThemeProvider,
-  CssBaseline,
-  StyledEngineProvider,
-} from "@mui/material";
-import createCache from "@emotion/cache";
+import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
 import { CacheProvider } from "@emotion/react";
-import { lightTheme, darkTheme } from "@/lib/theme";
+import createCache from "@emotion/cache";
 
 export default function ThemeRegistry({
   children,
@@ -21,35 +16,30 @@ export default function ThemeRegistry({
 }) {
   const direction = lang === "he" ? "rtl" : "ltr";
 
-  // ------------------------------------------------------------------
-  // 🔥 IMPORTANT: Emotion Cache MUST be stable across SSR + Client
-  // ------------------------------------------------------------------
   const cache = useMemo(
     () =>
       createCache({
         key: direction === "rtl" ? "mui-rtl" : "mui-ltr",
-        prepend: true, // ensures styles load FIRST -> prevents unstyled page
+        stylisPlugins: [],
       }),
     [direction]
   );
 
-  // ------------------------------------------------------------------
-  // 🔥 Choose existing theme and inject dynamic direction
-  // ------------------------------------------------------------------
-  const theme = useMemo(() => {
-    const base = mode === "dark" ? darkTheme : lightTheme;
-    return { ...base, direction };
-  }, [mode, direction]);
+  const theme = useMemo(
+    () =>
+      createTheme({
+        direction,
+        palette: { mode },
+      }),
+    [direction, mode]
+  );
 
   return (
     <CacheProvider value={cache}>
-      {/* Inject MUI styles FIRST before anything else */}
-      <StyledEngineProvider injectFirst>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          {children}
-        </ThemeProvider>
-      </StyledEngineProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        {children}
+      </ThemeProvider>
     </CacheProvider>
   );
 }

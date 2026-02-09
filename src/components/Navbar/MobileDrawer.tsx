@@ -2,10 +2,15 @@
 
 import { Drawer, Box, Button } from "@mui/material";
 import { useContext } from "react";
-import AppContext  from "../../lib/AppContext";
+import AppContext from "../../lib/AppContext";
 import NavbarLink from "./NavbarLink";
 
-export default function MobileDrawer({ open, onClose }) {
+export interface MobileDrawerProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+export default function MobileDrawer({ open, onClose }: MobileDrawerProps) {
   const { ui, lang, mode, toggleLang, toggleMode } = useContext(AppContext)!;
 
   return (
@@ -31,7 +36,7 @@ export default function MobileDrawer({ open, onClose }) {
         </Button>
 
         <Button onClick={toggleMode}>
-           {ui.getToggleThemeLabel(mode)}
+          {ui.getToggleThemeLabel(mode)}
         </Button>
       </Box>
     </Drawer>
