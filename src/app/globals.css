@@ -126,3 +126,29 @@ a {
     transition-duration: 0ms !important;
   }
 }
+#nextjs-devtools-toast,
+#nextjs-devtools-container,
+#nextjs-devtools-button,
+button[data-nextjs-dev-tools-button],
+div[data-nextjs-dev-tools-button],
+nextjs-portal,
+#nextjs-devtools,
+[aria-label="Open Next.js Dev Tools"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Also hide shadow-root injected button */
+nextjs-portal::part(button),
+#next-logo,
+#nextjs-dev-overlay {
+  display: none !important;
+}
+
+/* Override shadow DOM injection (strongest possible selector) */
+:root {
+  --nextjs-devtools-backdrop-display: none !important;
+}
+

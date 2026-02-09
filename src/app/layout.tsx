@@ -21,7 +21,7 @@ export default async function RootLayout({
     cookieStore.get("lang")?.value === "he" ? "he" : "en";
 
   return (
-    <html lang={lang} dir={lang === "he" ? "rtl" : "ltr"}>
+    <html lang={lang} dir={lang === "he" ? "rtl" : "ltr"}  data-nextjs-devtools="disable">
       <body>
         <AppProviderWrapper initialMode={mode} initialLang={lang}>
           {children}

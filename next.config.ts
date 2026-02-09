@@ -3,10 +3,11 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
-  // 🔥 FIX: Make cookies(), headers(), nextUrl synchronous
+  // Disable all Next.js DevTools injections
+ 
+
   experimental: {
-    syncCookies: true,
-    // (Optional) Prevent automatic async promotion of layout
+   
     serverActions: {
       allowedOrigins: ["*"],
     },
