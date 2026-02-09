@@ -9,10 +9,9 @@ export default function Testimonials() {
   const { ui, lang } = useContext(AppContext)!;
 
   const [index, setIndex] = useState(0);
-
   const isRTL = lang === "he";
 
-  // Auto-play every 3.5 seconds
+  // Auto-play
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % ui.reviews.length);
@@ -71,7 +70,12 @@ export default function Testimonials() {
                   borderRadius: 3,
                   textAlign: "center",
                   minHeight: 180,
-                  border: "1px solid rgba(255,255,255,0.15)",
+                  border: (theme) =>
+                    `1px solid ${
+                      theme.palette.mode === "dark"
+                        ? "rgba(255,255,255,0.15)"
+                        : "rgba(0,0,0,0.12)"
+                    }`,
                   backgroundColor: "background.paper",
                   boxShadow: "0px 4px 20px rgba(0,0,0,0.08)",
                 }}
@@ -104,33 +108,41 @@ export default function Testimonials() {
               transform: "translateY(-50%)",
             }}
           >
-            <button
+            <Box
+              component="button"
               onClick={prev}
               aria-label="Previous testimonial"
-              style={{
+              sx={(theme) => ({
                 background: "none",
                 border: "none",
-                color: "white",
                 cursor: "pointer",
-                fontSize: "1.5rem",
-              }}
+                fontSize: "1.7rem",
+                color: theme.palette.text.primary, // ⭐ FIX
+                opacity: 0.7,
+                transition: "opacity .2s",
+                "&:hover": { opacity: 1 },
+              })}
             >
               {isRTL ? "›" : "‹"}
-            </button>
+            </Box>
 
-            <button
+            <Box
+              component="button"
               onClick={next}
               aria-label="Next testimonial"
-              style={{
+              sx={(theme) => ({
                 background: "none",
                 border: "none",
-                color: "white",
                 cursor: "pointer",
-                fontSize: "1.5rem",
-              }}
+                fontSize: "1.7rem",
+                color: theme.palette.text.primary, // ⭐ FIX
+                opacity: 0.7,
+                transition: "opacity .2s",
+                "&:hover": { opacity: 1 },
+              })}
             >
               {isRTL ? "‹" : "›"}
-            </button>
+            </Box>
           </Box>
         </Box>
       </Box>
