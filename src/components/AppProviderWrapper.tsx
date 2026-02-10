@@ -1,10 +1,16 @@
 "use client";
 
+import {
+  ReactNode,
+  useState,
+  useMemo,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import AppContext from "@/lib/AppContext";
-import ThemeRegistry from "./ThemeRegistry";
-import NavbarClientWrapper from "./Navbar/NavbarClientWrapper";
-import { ReactNode, useState, useMemo, useCallback } from "react";
+import ThemeRegistry from "@/components/ThemeRegistry";
 import { ui as LANG_PACKS } from "@/lib/i18n";
+import NavbarClientWrapper from "./Navbar/NavbarClientWrapper";
 
 export default function AppProviderWrapper({
   children,
@@ -18,9 +24,15 @@ export default function AppProviderWrapper({
   const [mode, setMode] = useState(initialMode);
   const [lang, setLang] = useState(initialLang);
 
-  // 🔥 MAKE CALLBACKS STABLE
+  // 🔥 CRITICAL FIX: useLayoutEffect runs BEFORE hydration
+  useLayoutEffect(() => {
+    const html = document.documentElement;
+    html.setAttribute("dir", lang === "he" ? "rtl" : "ltr");
+    html.lang = lang;
+  }, [lang]);
+
   const toggleMode = useCallback(() => {
-    setMode(prev => {
+    setMode((prev) => {
       const next = prev === "dark" ? "light" : "dark";
       document.cookie = `mode=${next}; path=/; max-age=31536000`;
       return next;
@@ -28,11 +40,13 @@ export default function AppProviderWrapper({
   }, []);
 
   const toggleLang = useCallback(() => {
-    setLang(prev => {
+    setLang((prev) => {
       const next = prev === "he" ? "en" : "he";
+
+      // update cookie
       document.cookie = `lang=${next}; path=/; max-age=31536000`;
 
-      // also update <html>
+      // update <html> immediately (no flicker)
       const html = document.documentElement;
       html.setAttribute("dir", next === "he" ? "rtl" : "ltr");
       html.lang = next;
@@ -41,10 +55,9 @@ export default function AppProviderWrapper({
     });
   }, []);
 
-  // 🔥 ui is stable based on lang only
+  // stable UI object
   const ui = useMemo(() => LANG_PACKS[lang], [lang]);
 
-  // 🔥 CONTEXT VALUE: stable because callbacks are stable
   const value = useMemo(
     () => ({
       mode,
@@ -59,7 +72,9 @@ export default function AppProviderWrapper({
   return (
     <AppContext.Provider value={value}>
       <ThemeRegistry mode={mode} lang={lang}>
+        {/* Navbar must be inside ThemeRegistry */}
         <NavbarClientWrapper />
+
         {children}
       </ThemeRegistry>
     </AppContext.Provider>
