@@ -1,35 +1,25 @@
 "use client";
 
-import Link from "next/link";
 import { Box } from "@mui/material";
+import Link from "next/link";
+import type { ReactNode } from "react";
 
-export default function NavbarLink({ href, children }) {
+interface NavbarLinkProps {
+  href: string;
+  children: ReactNode;
+}
+
+export default function NavbarLink({ href, children }: NavbarLinkProps) {
   return (
     <Box
       component={Link}
       href={href}
-      sx={(theme) => ({
-        position: "relative",
-        color: theme.palette.text.primary,
+      sx={{
+        textDecoration: "none",
+        color: "inherit",
         fontWeight: 500,
-        px: 1,
-        py: 0.5,
-
-        "&::after": {
-          content: '""',
-          position: "absolute",
-          bottom: -3,
-          left: 0,
-          width: 0,
-          height: "2px",
-          bgcolor: theme.palette.primary.main,
-          transition: "width 0.3s ease",
-        },
-
-        "&:hover::after": {
-          width: "100%",
-        },
-      })}
+        "&:hover": { opacity: 0.7 },
+      }}
     >
       {children}
     </Box>
