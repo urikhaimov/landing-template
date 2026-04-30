@@ -64,7 +64,7 @@ export default function Navbar() {
             <Button
             variant="contained"
             startIcon={<WhatsAppIcon />}
-            href="https://wa.me/972501234567"
+             href="https://wa.me/972547401813"
             target="_blank"
             
             rel="noopener noreferrer"
