@@ -6,7 +6,7 @@ import { useContext, useState } from "react";
 import AppContext  from "../../lib/AppContext";
 import NavbarLink from "./NavbarLink";
 import MobileDrawer from "./MobileDrawer";
-
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 export default function Navbar() {
   const { ui, lang, mode, toggleLang, toggleMode } = useContext(AppContext)!;
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -61,6 +61,26 @@ export default function Navbar() {
             >
               {lang === "he" ? "ENGLISH" : "עברית"}
             </Button>
+            <Button
+            variant="contained"
+            startIcon={<WhatsAppIcon />}
+            href="https://wa.me/972501234567"
+            target="_blank"
+            
+            rel="noopener noreferrer"
+            sx={{
+              bgcolor: "#25D366",
+              color: "#fff",
+               direction: "ltr",
+              fontWeight: 600,
+              "&:hover": {
+                bgcolor: "#1ebe5d",
+              },
+            }}
+          >
+            WhatsApp
+          </Button>
+
 
           </Box>
 
