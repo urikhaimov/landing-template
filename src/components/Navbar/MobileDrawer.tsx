@@ -35,9 +35,7 @@ export default function MobileDrawer({ open, onClose }: MobileDrawerProps) {
           {lang === "he" ? "ENGLISH" : "עברית"}
         </Button>
 
-        <Button onClick={toggleMode}>
-          {ui.getToggleThemeLabel(mode)}
-        </Button>
+        
       </Box>
     </Drawer>
   );

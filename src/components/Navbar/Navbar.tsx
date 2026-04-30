@@ -61,17 +61,7 @@ export default function Navbar() {
             >
               {lang === "he" ? "ENGLISH" : "עברית"}
             </Button>
-<Button
-  variant="outlined"
-  size="small"
-  onClick={toggleMode}
-  sx={(theme) => ({
-    borderColor: theme.palette.divider,
-    color: theme.palette.text.primary,
-  })}
->
-  {ui.getToggleThemeLabel(mode)}
-</Button>
+
           </Box>
 
           {/* MOBILE MENU BUTTON */}

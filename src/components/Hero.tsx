@@ -95,13 +95,7 @@ export default function Hero() {
               {ui.toggleLang}
             </Button>
 
-            <Button
-              variant="outlined"
-              onClick={toggleMode}
-              aria-label="Toggle theme"
-            >
-              {ui.getToggleThemeLabel(mode)}
-            </Button>
+           
           </Box>
         </motion.div>
       </Box>
